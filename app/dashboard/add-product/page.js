@@ -36,8 +36,6 @@ export default function AddProductPage() {
   });
 
   const [images, setImages] = useState([]);
-  const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
-  const [uploading, setUploading] = useState(false);
   const [errors, setErrors] = useState({});
 
   // Bulk upload states
@@ -68,62 +66,20 @@ export default function AddProductPage() {
     }
   };
 
-  const handleImageChange = async (e) => {
+  const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     if (files.length + images.length > 4) {
       alert("You can only upload up to 4 images");
       return;
     }
+    setImages([...images, ...files]);
 
-    setUploading(true);
-
-    try {
-      // Upload images to Cloudinary
-      const formData = new FormData();
-      files.forEach((file) => formData.append("images", file));
-      formData.append("folder", "sabri-jewelry");
-
-      const response = await fetch("/api/admin/upload-images", {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        const newImageUrls = result.data.map((img) => ({
-          url: img.url,
-          public_id: img.public_id,
-          alt: `Jewelry product image`,
-          isPrimary: uploadedImageUrls.length === 0, // First image is primary
-        }));
-
-        setUploadedImageUrls([...uploadedImageUrls, ...newImageUrls]);
-        setImages([...images, ...files]); // Keep original files for display
-
-        // Clear image error if present
-        if (errors.images) {
-          setErrors({
-            ...errors,
-            images: "",
-          });
-        }
-
-        if (result.errors && result.errors.length > 0) {
-          console.warn("Some uploads had issues:", result.errors);
-        }
-      } else {
-        throw new Error(result.message || "Failed to upload images");
-      }
-    } catch (error) {
-      console.error("Image upload error:", error);
+    // Clear image error if present
+    if (errors.images) {
       setErrors({
         ...errors,
-        images: error.message || "Failed to upload images",
+        images: "",
       });
-    } finally {
-      setUploading(false);
     }
   };
 
@@ -143,7 +99,7 @@ export default function AddProductPage() {
     if (!form.material.trim()) newErrors.material = "Material is required";
     if (!form.metalType.trim()) newErrors.metalType = "Metal type is required";
     if (!form.weight.trim()) newErrors.weight = "Weight is required";
-    if (uploadedImageUrls.length === 0)
+    if (images.length === 0)
       newErrors.images = "At least one image is required";
 
     setErrors(newErrors);
@@ -198,8 +154,8 @@ export default function AddProductPage() {
     formData.append("women", form.women);
     formData.append("kids", form.kids);
 
-    // Images (use Cloudinary URLs)
-    formData.append("images", JSON.stringify(uploadedImageUrls));
+    // Add image files
+    images.forEach((img) => formData.append("images", img));
 
     try {
       const res = await fetch(`/api/products`, {
@@ -223,14 +179,27 @@ export default function AddProductPage() {
       setForm({
         name: "",
         price: 0,
+        originalPrice: 0,
         category: "",
+        subcategory: "",
         stock: 0,
-        brand: "",
+        brand: "Sabri",
         description: "",
-        frameDimensions: "",
-        productInformation: "",
-        newArrival: false,
-        hotSeller: false,
+        shortDescription: "",
+        sku: "",
+        material: "",
+        metalType: "",
+        gemstone: "",
+        weight: "",
+        dimensions: "",
+        careInstructions: "",
+        warranty: "",
+        isNewArrival: false,
+        isBestSeller: false,
+        isFeatured: false,
+        isGiftable: true,
+        isOnSale: false,
+        discount: 0,
         men: false,
         women: false,
         kids: false,
@@ -1510,28 +1479,16 @@ export default function AddProductPage() {
               <p className="text-red-500 text-sm mt-1">{errors.images}</p>
             )}
 
-            {/* Upload Progress */}
-            {uploading && (
-              <div className="mt-2 p-3 bg-blue-900/50 border border-blue-600 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-400"></div>
-                  <span className="text-sm text-blue-300">
-                    Uploading images to Cloudinary...
-                  </span>
-                </div>
-              </div>
-            )}
-
             {/* Image Previews */}
             <div className="flex gap-2 mt-2 flex-wrap">
-              {uploadedImageUrls.map((img, i) => (
+              {images.map((img, i) => (
                 <div key={i} className="relative group">
                   <img
-                    src={img.url}
-                    alt={img.alt}
+                    src={URL.createObjectURL(img)}
+                    alt={`Product image ${i + 1}`}
                     className="w-20 h-20 object-cover rounded border border-gray-600"
                   />
-                  {img.isPrimary && (
+                  {i === 0 && (
                     <div className="absolute top-1 left-1 bg-green-600 text-white text-xs px-1 rounded">
                       Primary
                     </div>
@@ -1539,9 +1496,6 @@ export default function AddProductPage() {
                   <button
                     type="button"
                     onClick={() => {
-                      setUploadedImageUrls(
-                        uploadedImageUrls.filter((_, index) => index !== i)
-                      );
                       setImages(images.filter((_, index) => index !== i));
                     }}
                     className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
@@ -1552,7 +1506,7 @@ export default function AddProductPage() {
               ))}
 
               {/* Upload more button */}
-              {uploadedImageUrls.length < 4 && !uploading && (
+              {images.length < 4 && (
                 <label className="w-20 h-20 border-2 border-dashed border-gray-600 rounded-lg flex items-center justify-center cursor-pointer hover:border-gray-500 transition-colors">
                   <svg
                     className="w-6 h-6 text-gray-400"
