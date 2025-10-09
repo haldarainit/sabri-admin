@@ -11,16 +11,30 @@ export default function EditProductPage() {
   const [form, setForm] = useState({
     name: "",
     price: 0,
+    originalPrice: 0,
+    discount: 0,
     category: "",
+    subcategory: "",
     stock: 0,
     brand: "",
     description: "",
-    frameDimensions: "",
-    productInformation: "",
-    newArrival: false,
-    hotSeller: false,
+    shortDescription: "",
+    sku: "",
+    specifications: {
+      material: "",
+      metalType: "",
+      gemstone: "",
+      dimensions: "",
+      careInstructions: "",
+      warranty: "",
+    },
+    isNewArrival: false,
+    isBestSeller: false,
+    isFeatured: false,
+    isGiftable: true,
+    isOnSale: false,
     men: false,
-    women: false,
+    women: true,
     kids: false,
   });
 
@@ -45,20 +59,36 @@ export default function EditProductPage() {
         throw new Error("Failed to fetch product");
       }
 
-      const product = await response.json();
+      const responseData = await response.json();
+      const product = responseData.data || responseData;
       setForm({
         name: product.name || "",
         price: product.price || 0,
+        originalPrice: product.originalPrice || 0,
+        discount: product.discount || 0,
         category: product.category || "",
+        subcategory: product.subcategory || "",
         stock: product.stock || 0,
         brand: product.brand || "",
         description: product.description || "",
-        frameDimensions: product.frameDimensions || "",
-        productInformation: product.productInformation || "",
-        newArrival: product.newArrival || false,
-        hotSeller: product.hotSeller || false,
+        shortDescription: product.shortDescription || "",
+        sku: product.sku || "",
+        specifications: product.specifications || {
+          material: "",
+          metalType: "",
+          gemstone: "",
+          dimensions: "",
+          careInstructions: "",
+          warranty: "",
+        },
+        isNewArrival: product.isNewArrival || false,
+        isBestSeller: product.isBestSeller || false,
+        isFeatured: product.isFeatured || false,
+        isGiftable:
+          product.isGiftable !== undefined ? product.isGiftable : true,
+        isOnSale: product.isOnSale || false,
         men: product.men || false,
-        women: product.women || false,
+        women: product.women !== undefined ? product.women : true,
         kids: product.kids || false,
       });
       setExistingImages(product.images || []);
@@ -118,12 +148,15 @@ export default function EditProductPage() {
     if (!form.name.trim()) newErrors.name = "Product name is required";
     if (!form.price || form.price <= 0)
       newErrors.price = "Valid price is required";
+    if (!form.originalPrice || form.originalPrice <= 0)
+      newErrors.originalPrice = "Valid original price is required";
     if (!form.category.trim()) newErrors.category = "Category is required";
     if (!form.stock || form.stock < 0)
       newErrors.stock = "Valid stock quantity is required";
     if (!form.brand.trim()) newErrors.brand = "Brand is required";
     if (!form.description.trim())
       newErrors.description = "Description is required";
+    if (!form.sku.trim()) newErrors.sku = "SKU is required";
     if (images.length + existingImages.length === 0)
       newErrors.images = "At least one image is required";
 
@@ -142,7 +175,11 @@ export default function EditProductPage() {
     // Preparing form data for backend (with images)
     const formData = new FormData();
     Object.keys(form).forEach((key) => {
-      formData.append(key, form[key]);
+      if (key === "specifications") {
+        formData.append(key, JSON.stringify(form[key]));
+      } else {
+        formData.append(key, form[key]);
+      }
     });
 
     // Add new images
@@ -225,70 +262,160 @@ export default function EditProductPage() {
             )}
           </div>
 
-          {/* Price */}
+          {/* Price and Original Price */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Current Price *
+              </label>
+              <input
+                type="number"
+                name="price"
+                placeholder="e.g., 150"
+                value={form.price}
+                onChange={handleChange}
+                className={`w-full p-3 border rounded-lg ${
+                  errors.price ? "border-red-500" : "border-gray-300"
+                }`}
+                min="0"
+                step="0.01"
+                required
+              />
+              {errors.price && (
+                <p className="text-red-500 text-sm mt-1">{errors.price}</p>
+              )}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Original Price *
+              </label>
+              <input
+                type="number"
+                name="originalPrice"
+                placeholder="e.g., 200"
+                value={form.originalPrice}
+                onChange={handleChange}
+                className={`w-full p-3 border rounded-lg ${
+                  errors.originalPrice ? "border-red-500" : "border-gray-300"
+                }`}
+                min="0"
+                step="0.01"
+                required
+              />
+              {errors.originalPrice && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.originalPrice}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Discount */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Price *
+              Discount (%)
             </label>
             <input
               type="number"
-              name="price"
-              placeholder="e.g., 150"
-              value={form.price}
-              onChange={handleChange}
-              className={`w-full p-3 border rounded-lg ${
-                errors.price ? "border-red-500" : "border-gray-300"
-              }`}
-              min="0"
-              step="0.01"
-              required
-            />
-            {errors.price && (
-              <p className="text-red-500 text-sm mt-1">{errors.price}</p>
-            )}
-          </div>
-
-          {/* Category */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Category *
-            </label>
-            <input
-              type="text"
-              name="category"
-              placeholder="e.g., Sunglasses"
-              value={form.category}
-              onChange={handleChange}
-              className={`w-full p-3 border rounded-lg ${
-                errors.category ? "border-red-500" : "border-gray-300"
-              }`}
-              required
-            />
-            {errors.category && (
-              <p className="text-red-500 text-sm mt-1">{errors.category}</p>
-            )}
-          </div>
-
-          {/* Stock */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Stock Quantity *
-            </label>
-            <input
-              type="number"
-              name="stock"
+              name="discount"
               placeholder="e.g., 25"
-              value={form.stock}
+              value={form.discount}
               onChange={handleChange}
-              className={`w-full p-3 border rounded-lg ${
-                errors.stock ? "border-red-500" : "border-gray-300"
-              }`}
+              className="w-full p-3 border border-gray-300 rounded-lg"
               min="0"
-              required
+              max="100"
+              step="0.01"
             />
-            {errors.stock && (
-              <p className="text-red-500 text-sm mt-1">{errors.stock}</p>
-            )}
+          </div>
+
+          {/* Category and Subcategory */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Category *
+              </label>
+              <select
+                name="category"
+                value={form.category}
+                onChange={handleChange}
+                className={`w-full p-3 border rounded-lg ${
+                  errors.category ? "border-red-500" : "border-gray-300"
+                }`}
+                required
+              >
+                <option value="">Select Category</option>
+                <option value="rings">Rings</option>
+                <option value="necklaces">Necklaces</option>
+                <option value="earrings">Earrings</option>
+                <option value="bracelets">Bracelets</option>
+                <option value="fine-gold">Fine Gold</option>
+                <option value="fine-silver">Fine Silver</option>
+                <option value="mens">Men's</option>
+                <option value="gifts">Gifts</option>
+                <option value="new-arrivals">New Arrivals</option>
+                <option value="best-sellers">Best Sellers</option>
+                <option value="collections">Collections</option>
+              </select>
+              {errors.category && (
+                <p className="text-red-500 text-sm mt-1">{errors.category}</p>
+              )}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Subcategory
+              </label>
+              <input
+                type="text"
+                name="subcategory"
+                placeholder="e.g., Wedding Rings"
+                value={form.subcategory}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-300 rounded-lg"
+              />
+            </div>
+          </div>
+
+          {/* Stock and SKU */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Stock Quantity *
+              </label>
+              <input
+                type="number"
+                name="stock"
+                placeholder="e.g., 25"
+                value={form.stock}
+                onChange={handleChange}
+                className={`w-full p-3 border rounded-lg ${
+                  errors.stock ? "border-red-500" : "border-gray-300"
+                }`}
+                min="0"
+                required
+              />
+              {errors.stock && (
+                <p className="text-red-500 text-sm mt-1">{errors.stock}</p>
+              )}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                SKU *
+              </label>
+              <input
+                type="text"
+                name="sku"
+                placeholder="e.g., SAB-RING-001"
+                value={form.sku}
+                onChange={handleChange}
+                className={`w-full p-3 border rounded-lg ${
+                  errors.sku ? "border-red-500" : "border-gray-300"
+                }`}
+                required
+              />
+              {errors.sku && (
+                <p className="text-red-500 text-sm mt-1">{errors.sku}</p>
+              )}
+            </div>
           </div>
 
           {/* Brand */}
@@ -299,7 +426,7 @@ export default function EditProductPage() {
             <input
               type="text"
               name="brand"
-              placeholder="e.g., Ray-Ban"
+              placeholder="e.g., Sabri"
               value={form.brand}
               onChange={handleChange}
               className={`w-full p-3 border rounded-lg ${
@@ -312,55 +439,177 @@ export default function EditProductPage() {
             )}
           </div>
 
-          {/* Description */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Product Description *
-            </label>
-            <textarea
-              name="description"
-              placeholder="e.g., Classic aviator sunglasses with premium UV protection and durable metal frame..."
-              value={form.description}
-              onChange={handleChange}
-              className={`w-full p-3 border rounded-lg ${
-                errors.description ? "border-red-500" : "border-gray-300"
-              }`}
-              rows={4}
-              required
-            />
-            {errors.description && (
-              <p className="text-red-500 text-sm mt-1">{errors.description}</p>
-            )}
+          {/* Description and Short Description */}
+          <div className="grid grid-cols-1 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Product Description *
+              </label>
+              <textarea
+                name="description"
+                placeholder="Detailed description of the product..."
+                value={form.description}
+                onChange={handleChange}
+                className={`w-full p-3 border rounded-lg ${
+                  errors.description ? "border-red-500" : "border-gray-300"
+                }`}
+                rows={4}
+                required
+              />
+              {errors.description && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.description}
+                </p>
+              )}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Short Description
+              </label>
+              <textarea
+                name="shortDescription"
+                placeholder="Brief description for product cards..."
+                value={form.shortDescription}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-300 rounded-lg"
+                rows={2}
+              />
+            </div>
           </div>
 
-          {/* Frame Dimensions */}
+          {/* Specifications */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Frame Dimensions
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              Product Specifications
             </label>
-            <input
-              type="text"
-              name="frameDimensions"
-              placeholder="e.g., 58-14-140 mm"
-              value={form.frameDimensions}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-lg"
-            />
-          </div>
-
-          {/* Product Information */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Product Information
-            </label>
-            <textarea
-              name="productInformation"
-              placeholder="e.g., Material: Metal frame, Glass lenses. Features: UV400 protection, Anti-reflective coating..."
-              value={form.productInformation}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-lg"
-              rows={3}
-            />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  Material
+                </label>
+                <input
+                  type="text"
+                  name="specifications.material"
+                  placeholder="e.g., 18K Gold"
+                  value={form.specifications.material}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      specifications: {
+                        ...form.specifications,
+                        material: e.target.value,
+                      },
+                    })
+                  }
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  Metal Type
+                </label>
+                <input
+                  type="text"
+                  name="specifications.metalType"
+                  placeholder="e.g., Yellow Gold"
+                  value={form.specifications.metalType}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      specifications: {
+                        ...form.specifications,
+                        metalType: e.target.value,
+                      },
+                    })
+                  }
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  Gemstone
+                </label>
+                <input
+                  type="text"
+                  name="specifications.gemstone"
+                  placeholder="e.g., Diamond"
+                  value={form.specifications.gemstone}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      specifications: {
+                        ...form.specifications,
+                        gemstone: e.target.value,
+                      },
+                    })
+                  }
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  Dimensions
+                </label>
+                <input
+                  type="text"
+                  name="specifications.dimensions"
+                  placeholder="e.g., 6mm width"
+                  value={form.specifications.dimensions}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      specifications: {
+                        ...form.specifications,
+                        dimensions: e.target.value,
+                      },
+                    })
+                  }
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  Care Instructions
+                </label>
+                <input
+                  type="text"
+                  name="specifications.careInstructions"
+                  placeholder="e.g., Clean with soft cloth"
+                  value={form.specifications.careInstructions}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      specifications: {
+                        ...form.specifications,
+                        careInstructions: e.target.value,
+                      },
+                    })
+                  }
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  Warranty
+                </label>
+                <input
+                  type="text"
+                  name="specifications.warranty"
+                  placeholder="e.g., 1 year"
+                  value={form.specifications.warranty}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      specifications: {
+                        ...form.specifications,
+                        warranty: e.target.value,
+                      },
+                    })
+                  }
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                />
+              </div>
+            </div>
           </div>
 
           {/* Images */}
@@ -377,7 +626,7 @@ export default function EditProductPage() {
                   {existingImages.map((img, i) => (
                     <div key={i} className="relative">
                       <img
-                        src={img.url}
+                        src={typeof img === "string" ? img : img.url}
                         alt="existing"
                         className="w-20 h-20 object-cover rounded border"
                       />
@@ -434,17 +683,17 @@ export default function EditProductPage() {
             )}
           </div>
 
-          {/* Categories */}
+          {/* Product Flags */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">
-              Product Categories
+              Product Flags
             </label>
             <div className="grid grid-cols-2 gap-3">
               <label className="flex items-center gap-2 p-2 border rounded-lg hover:bg-gray-50">
                 <input
                   type="checkbox"
-                  name="newArrival"
-                  checked={form.newArrival}
+                  name="isNewArrival"
+                  checked={form.isNewArrival}
                   onChange={handleChange}
                   className="text-blue-600"
                 />
@@ -454,14 +703,55 @@ export default function EditProductPage() {
               <label className="flex items-center gap-2 p-2 border rounded-lg hover:bg-gray-50">
                 <input
                   type="checkbox"
-                  name="hotSeller"
-                  checked={form.hotSeller}
+                  name="isBestSeller"
+                  checked={form.isBestSeller}
                   onChange={handleChange}
                   className="text-blue-600"
                 />
-                <span>Hot Seller</span>
+                <span>Best Seller</span>
               </label>
 
+              <label className="flex items-center gap-2 p-2 border rounded-lg hover:bg-gray-50">
+                <input
+                  type="checkbox"
+                  name="isFeatured"
+                  checked={form.isFeatured}
+                  onChange={handleChange}
+                  className="text-blue-600"
+                />
+                <span>Featured</span>
+              </label>
+
+              <label className="flex items-center gap-2 p-2 border rounded-lg hover:bg-gray-50">
+                <input
+                  type="checkbox"
+                  name="isGiftable"
+                  checked={form.isGiftable}
+                  onChange={handleChange}
+                  className="text-blue-600"
+                />
+                <span>Giftable</span>
+              </label>
+
+              <label className="flex items-center gap-2 p-2 border rounded-lg hover:bg-gray-50">
+                <input
+                  type="checkbox"
+                  name="isOnSale"
+                  checked={form.isOnSale}
+                  onChange={handleChange}
+                  className="text-blue-600"
+                />
+                <span>On Sale</span>
+              </label>
+            </div>
+          </div>
+
+          {/* Target Audience */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              Target Audience
+            </label>
+            <div className="grid grid-cols-3 gap-3">
               <label className="flex items-center gap-2 p-2 border rounded-lg hover:bg-gray-50">
                 <input
                   type="checkbox"

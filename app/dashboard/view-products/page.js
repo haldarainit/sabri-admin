@@ -27,7 +27,7 @@ export default function ViewProductsPage() {
         }
 
         const data = await res.json();
-        setProducts(data.products || []);
+        setProducts(data.data?.products || []);
       } catch (error) {
         console.error("Error fetching products:", error);
         // Show error notification
@@ -473,7 +473,11 @@ export default function ViewProductsPage() {
                               {product.images && product.images.length > 0 ? (
                                 <img
                                   className="h-16 w-16 rounded-lg object-cover shadow-sm border border-white/20"
-                                  src={product.images[0].url}
+                                  src={
+                                    typeof product.images[0] === "string"
+                                      ? product.images[0]
+                                      : product.images[0].url
+                                  }
                                   alt={product.name}
                                 />
                               ) : (
