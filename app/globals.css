@@ -1,11 +1,18 @@
 @import "tailwindcss";
 
-/* Set Outfit as default font */
-:root {
-  --font-outfit: "Outfit", sans-serif;
+/* Use Chakra body font variable globally, with safe fallbacks */
+body,
+button,
+input,
+select,
+textarea {
+  font-family: var(
+    --chakra-fonts-body,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif
+  );
 }
-
-body {
-  font-family: var(--font-outfit);
-}
-
