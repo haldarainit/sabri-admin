@@ -74,10 +74,10 @@ export default function DashboardLayout({ children }) {
 
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center bg-white">
+      <div className="h-screen flex items-center justify-center bg-gray-900">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#6b4f3a] mx-auto mb-4"></div>
-          <p className="text-gray-700 font-medium">
+          <p className="text-gray-300 font-medium">
             Checking authentication...
           </p>
         </div>
@@ -86,18 +86,18 @@ export default function DashboardLayout({ children }) {
   }
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden bg-gray-50">
+    <div className="h-screen flex flex-col overflow-hidden bg-gray-900">
       {/* Fixed Navbar */}
-      <nav className="bg-white border-b border-gray-200 text-gray-900 p-4 flex justify-between items-center relative z-50 flex-shrink-0 shadow-sm">
+      <nav className="bg-gray-800 border-b border-gray-700 text-gray-100 p-4 flex justify-between items-center relative z-50 flex-shrink-0 shadow-lg">
         <div className="flex items-center gap-4">
           {/* Menu Toggle Button */}
           <button
             onClick={toggleSidebar}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-all duration-300"
+            className="p-2 rounded-lg hover:bg-gray-700 transition-all duration-300"
             title={sidebarVisible ? "Hide Menu" : "Show Menu"}
           >
             <svg
-              className="w-6 h-6 text-gray-600"
+              className="w-6 h-6 text-gray-300"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -126,12 +126,12 @@ export default function DashboardLayout({ children }) {
                 />
               </svg>
             </div>
-            <div className="text-xl font-bold text-gray-900">Sabri Admin</div>
+            <div className="text-xl font-bold text-gray-100">Sabri Admin</div>
           </div>
         </div>
         <div className="flex items-center gap-4">
           {admin && (
-            <div className="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg">
+            <div className="flex items-center gap-2 px-3 py-2 bg-gray-700 rounded-lg">
               <div className="w-8 h-8 bg-[#6b4f3a] rounded-full flex items-center justify-center">
                 <svg
                   className="w-4 h-4 text-white"
@@ -147,7 +147,7 @@ export default function DashboardLayout({ children }) {
                   />
                 </svg>
               </div>
-              <span className="text-sm font-medium text-gray-700">
+              <span className="text-sm font-medium text-gray-300">
                 {admin.email}
               </span>
             </div>
@@ -182,14 +182,14 @@ export default function DashboardLayout({ children }) {
         <aside
           className={`${
             sidebarVisible ? "translate-x-0" : "-translate-x-full"
-          } fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 transition-transform duration-300 bg-white border-r border-gray-200 z-40 flex-shrink-0 shadow-sm`}
+          } fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 transition-transform duration-300 bg-gray-800 border-r border-gray-700 z-40 flex-shrink-0 shadow-lg`}
         >
           <div className="p-6 h-full overflow-y-auto">
             <ul className="space-y-2">
               {/* Dashboard Section */}
               <li className="mb-4">
                 <div className="px-4 py-2">
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
                     Dashboard
                   </h3>
                 </div>
@@ -201,11 +201,11 @@ export default function DashboardLayout({ children }) {
                     // Close sidebar on mobile after navigation
                     if (window.innerWidth < 1024) setSidebarVisible(false);
                   }}
-                  className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100 transition-all duration-300 text-gray-700 flex items-center gap-3 group"
+                  className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-700 transition-all duration-300 text-gray-300 flex items-center gap-3 group"
                 >
-                  <div className="w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center group-hover:bg-[#6b4f3a] group-hover:text-white transition-all duration-300">
+                  <div className="w-8 h-8 bg-gray-700 rounded-lg flex items-center justify-center group-hover:bg-[#6b4f3a] group-hover:text-white transition-all duration-300">
                     <svg
-                      className="w-4 h-4 text-gray-600 group-hover:text-white"
+                      className="w-4 h-4 text-gray-400 group-hover:text-white"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -234,11 +234,11 @@ export default function DashboardLayout({ children }) {
                     // Close sidebar on mobile after navigation
                     if (window.innerWidth < 1024) setSidebarVisible(false);
                   }}
-                  className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100 transition-all duration-300 text-gray-700 flex items-center gap-3 group"
+                  className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-700 transition-all duration-300 text-gray-300 flex items-center gap-3 group"
                 >
-                  <div className="w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center group-hover:bg-green-600 group-hover:text-white transition-all duration-300">
+                  <div className="w-8 h-8 bg-gray-700 rounded-lg flex items-center justify-center group-hover:bg-green-600 group-hover:text-white transition-all duration-300">
                     <svg
-                      className="w-4 h-4 text-gray-600 group-hover:text-white"
+                      className="w-4 h-4 text-gray-400 group-hover:text-white"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -260,11 +260,11 @@ export default function DashboardLayout({ children }) {
                     router.push("/dashboard/view-products");
                     if (window.innerWidth < 1024) setSidebarVisible(false);
                   }}
-                  className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100 transition-all duration-300 text-gray-700 flex items-center gap-3 group"
+                  className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-700 transition-all duration-300 text-gray-300 flex items-center gap-3 group"
                 >
-                  <div className="w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                  <div className="w-8 h-8 bg-gray-700 rounded-lg flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
                     <svg
-                      className="w-4 h-4 text-gray-600 group-hover:text-white"
+                      className="w-4 h-4 text-gray-400 group-hover:text-white"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -286,11 +286,11 @@ export default function DashboardLayout({ children }) {
                     router.push("/dashboard/orders");
                     if (window.innerWidth < 1024) setSidebarVisible(false);
                   }}
-                  className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100 transition-all duration-300 text-gray-700 flex items-center gap-3 group"
+                  className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-700 transition-all duration-300 text-gray-300 flex items-center gap-3 group"
                 >
-                  <div className="w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center group-hover:bg-orange-600 group-hover:text-white transition-all duration-300">
+                  <div className="w-8 h-8 bg-gray-700 rounded-lg flex items-center justify-center group-hover:bg-orange-600 group-hover:text-white transition-all duration-300">
                     <svg
-                      className="w-4 h-4 text-gray-600 group-hover:text-white"
+                      className="w-4 h-4 text-gray-400 group-hover:text-white"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -313,11 +313,11 @@ export default function DashboardLayout({ children }) {
                     router.push("/dashboard/staffs");
                     if (window.innerWidth < 1024) setSidebarVisible(false);
                   }}
-                  className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100 transition-all duration-300 text-gray-700 flex items-center gap-3 group"
+                  className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-700 transition-all duration-300 text-gray-300 flex items-center gap-3 group"
                 >
-                  <div className="w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center group-hover:bg-teal-600 group-hover:text-white transition-all duration-300">
+                  <div className="w-8 h-8 bg-gray-700 rounded-lg flex items-center justify-center group-hover:bg-teal-600 group-hover:text-white transition-all duration-300">
                     <svg
-                      className="w-4 h-4 text-gray-600 group-hover:text-white"
+                      className="w-4 h-4 text-gray-400 group-hover:text-white"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -339,11 +339,11 @@ export default function DashboardLayout({ children }) {
                     router.push("/dashboard/customers");
                     if (window.innerWidth < 1024) setSidebarVisible(false);
                   }}
-                  className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100 transition-all duration-300 text-gray-700 flex items-center gap-3 group"
+                  className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-700 transition-all duration-300 text-gray-300 flex items-center gap-3 group"
                 >
-                  <div className="w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-all duration-300">
+                  <div className="w-8 h-8 bg-gray-700 rounded-lg flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-all duration-300">
                     <svg
-                      className="w-4 h-4 text-gray-600 group-hover:text-white"
+                      className="w-4 h-4 text-gray-400 group-hover:text-white"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -365,11 +365,11 @@ export default function DashboardLayout({ children }) {
                     router.push("/dashboard/coupons");
                     if (window.innerWidth < 1024) setSidebarVisible(false);
                   }}
-                  className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100 transition-all duration-300 text-gray-700 flex items-center gap-3 group"
+                  className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-700 transition-all duration-300 text-gray-300 flex items-center gap-3 group"
                 >
-                  <div className="w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center group-hover:bg-yellow-600 group-hover:text-white transition-all duration-300">
+                  <div className="w-8 h-8 bg-gray-700 rounded-lg flex items-center justify-center group-hover:bg-yellow-600 group-hover:text-white transition-all duration-300">
                     <svg
-                      className="w-4 h-4 text-gray-600 group-hover:text-white"
+                      className="w-4 h-4 text-gray-400 group-hover:text-white"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -392,12 +392,12 @@ export default function DashboardLayout({ children }) {
                     onClick={() =>
                       setShippingDropdownOpen(!shippingDropdownOpen)
                     }
-                    className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100 transition-all duration-300 text-gray-700 flex items-center justify-between group"
+                    className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-700 transition-all duration-300 text-gray-300 flex items-center justify-between group"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
+                      <div className="w-8 h-8 bg-gray-700 rounded-lg flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
                         <svg
-                          className="w-4 h-4 text-gray-600 group-hover:text-white"
+                          className="w-4 h-4 text-gray-400 group-hover:text-white"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -437,11 +437,11 @@ export default function DashboardLayout({ children }) {
                             if (window.innerWidth < 1024)
                               setSidebarVisible(false);
                           }}
-                          className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 transition-all duration-300 text-gray-600 flex items-center gap-3 text-sm"
+                          className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-700 transition-all duration-300 text-gray-400 flex items-center gap-3 text-sm"
                         >
-                          <div className="w-6 h-6 bg-gray-200 rounded flex items-center justify-center">
+                          <div className="w-6 h-6 bg-gray-600 rounded flex items-center justify-center">
                             <svg
-                              className="w-3 h-3 text-gray-600"
+                              className="w-3 h-3 text-gray-300"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -470,11 +470,11 @@ export default function DashboardLayout({ children }) {
                             if (window.innerWidth < 1024)
                               setSidebarVisible(false);
                           }}
-                          className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 transition-all duration-300 text-gray-600 flex items-center gap-3 text-sm"
+                          className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-700 transition-all duration-300 text-gray-400 flex items-center gap-3 text-sm"
                         >
-                          <div className="w-6 h-6 bg-gray-200 rounded flex items-center justify-center">
+                          <div className="w-6 h-6 bg-gray-600 rounded flex items-center justify-center">
                             <svg
-                              className="w-3 h-3 text-gray-600"
+                              className="w-3 h-3 text-gray-300"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -508,7 +508,7 @@ export default function DashboardLayout({ children }) {
 
         {/* Scrollable Main Content */}
         <main
-          className={`flex-1 bg-gray-50 transition-all duration-300 overflow-hidden ${
+          className={`flex-1 bg-gray-900 transition-all duration-300 overflow-hidden ${
             sidebarVisible ? "lg:ml-64" : "ml-0"
           }`}
         >

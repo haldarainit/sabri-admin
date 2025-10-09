@@ -430,14 +430,14 @@ export default function Dashboard() {
     plugins: {
       legend: {
         labels: {
-          color: "#374151",
+          color: "#D1D5DB",
         },
       },
     },
     scales: {
       x: {
         ticks: {
-          color: "#6b7280",
+          color: "#9CA3AF",
         },
         grid: {
           color: "rgba(107, 114, 128, 0.1)",
@@ -445,7 +445,7 @@ export default function Dashboard() {
       },
       y: {
         ticks: {
-          color: "#6b7280",
+          color: "#9CA3AF",
         },
         grid: {
           color: "rgba(107, 114, 128, 0.1)",
@@ -460,7 +460,7 @@ export default function Dashboard() {
         <div className="flex items-center justify-center min-h-96">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#6b4f3a] mx-auto mb-4"></div>
-            <p className="text-gray-700 font-medium">Loading dashboard...</p>
+            <p className="text-gray-300 font-medium">Loading dashboard...</p>
           </div>
         </div>
       </div>
@@ -471,13 +471,13 @@ export default function Dashboard() {
     <div className="space-y-6">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        <h1 className="text-3xl font-bold text-gray-100 mb-2">
           Dashboard Overview
         </h1>
-        <p className="text-gray-600 font-medium mb-1">
+        <p className="text-gray-300 font-medium mb-1">
           {getGreeting()}, Admin.
         </p>
-        <p className="text-gray-500">
+        <p className="text-gray-400">
           Welcome to your Sabri admin dashboard. Here's what's happening with
           your jewelry store.
         </p>
@@ -486,16 +486,16 @@ export default function Dashboard() {
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         {/* Total Customers */}
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
+        <div className="bg-gray-800 border border-gray-700 rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-600 text-sm font-medium">
+              <p className="text-gray-300 text-sm font-medium">
                 Total Customers
               </p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">
+              <p className="text-3xl font-bold text-gray-100 mt-2">
                 {stats.totalCustomers}
               </p>
-              <p className="text-gray-500 text-xs mt-1">Registered users</p>
+              <p className="text-gray-400 text-xs mt-1">Registered users</p>
             </div>
             <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
               <svg
@@ -516,16 +516,16 @@ export default function Dashboard() {
         </div>
 
         {/* Total Orders */}
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
+        <div className="bg-gray-800 border border-gray-700 rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-600 text-sm font-medium">Total Orders</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">
+              <p className="text-gray-300 text-sm font-medium">Total Orders</p>
+              <p className="text-3xl font-bold text-gray-100 mt-2">
                 {stats.totalOrders}
               </p>
-              <p className="text-gray-500 text-xs mt-1">All time orders</p>
+              <p className="text-gray-400 text-xs mt-1">All time orders</p>
             </div>
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 bg-green-800 rounded-lg flex items-center justify-center">
               <svg
                 className="w-6 h-6 text-green-600"
                 fill="none"
@@ -544,16 +544,16 @@ export default function Dashboard() {
         </div>
 
         {/* Total Products */}
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
+        <div className="bg-gray-800 border border-gray-700 rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-600 text-sm font-medium">
+              <p className="text-gray-300 text-sm font-medium">
                 Total Products
               </p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">
+              <p className="text-3xl font-bold text-gray-100 mt-2">
                 {stats.totalProducts}
               </p>
-              <p className="text-gray-500 text-xs mt-1">In inventory</p>
+              <p className="text-gray-400 text-xs mt-1">In inventory</p>
             </div>
             <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
               <svg
@@ -574,14 +574,14 @@ export default function Dashboard() {
         </div>
 
         {/* Total Revenue */}
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
+        <div className="bg-gray-800 border border-gray-700 rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-600 text-sm font-medium">Total Revenue</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">
+              <p className="text-gray-300 text-sm font-medium">Total Revenue</p>
+              <p className="text-3xl font-bold text-gray-100 mt-2">
                 ₹{stats.totalRevenue.toLocaleString()}
               </p>
-              <p className="text-gray-500 text-xs mt-1">All time sales</p>
+              <p className="text-gray-400 text-xs mt-1">All time sales</p>
             </div>
             <div className="w-12 h-12 bg-[#6b4f3a] bg-opacity-10 rounded-lg flex items-center justify-center">
               <svg
@@ -605,12 +605,12 @@ export default function Dashboard() {
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         {/* Revenue Chart */}
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+        <div className="bg-gray-800 border border-gray-700 rounded-xl shadow-sm p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">
+            <h3 className="text-lg font-semibold text-gray-100">
               Revenue Overview
             </h3>
-            <div className="text-sm text-gray-500">Last 7 days</div>
+            <div className="text-sm text-gray-400">Last 7 days</div>
           </div>
           <div className="h-64">
             <Line data={generateRevenueChartData()} options={chartOptions} />
@@ -618,12 +618,12 @@ export default function Dashboard() {
         </div>
 
         {/* Orders Chart */}
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+        <div className="bg-gray-800 border border-gray-700 rounded-xl shadow-sm p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">
+            <h3 className="text-lg font-semibold text-gray-100">
               Orders Trend
             </h3>
-            <div className="text-sm text-gray-500">Last 7 days</div>
+            <div className="text-sm text-gray-400">Last 7 days</div>
           </div>
           <div className="h-64">
             <Bar data={generateOrdersChartData()} options={chartOptions} />
@@ -634,12 +634,12 @@ export default function Dashboard() {
       {/* Additional Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         {/* Order Status Pie Chart */}
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+        <div className="bg-gray-800 border border-gray-700 rounded-xl shadow-sm p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">
+            <h3 className="text-lg font-semibold text-gray-100">
               Order Status
             </h3>
-            <div className="text-sm text-gray-500">Distribution</div>
+            <div className="text-sm text-gray-400">Distribution</div>
           </div>
           <div className="h-64">
             <Pie
@@ -651,7 +651,7 @@ export default function Dashboard() {
                   legend: {
                     position: "bottom",
                     labels: {
-                      color: "#374151",
+                      color: "#D1D5DB",
                       padding: 15,
                     },
                   },
@@ -662,12 +662,12 @@ export default function Dashboard() {
         </div>
 
         {/* Top Products Chart */}
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+        <div className="bg-gray-800 border border-gray-700 rounded-xl shadow-sm p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">
+            <h3 className="text-lg font-semibold text-gray-100">
               Top Products
             </h3>
-            <div className="text-sm text-gray-500">By Stock</div>
+            <div className="text-sm text-gray-400">By Stock</div>
           </div>
           <div className="h-64">
             <Bar
@@ -687,12 +687,12 @@ export default function Dashboard() {
         </div>
 
         {/* Monthly Revenue Chart */}
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+        <div className="bg-gray-800 border border-gray-700 rounded-xl shadow-sm p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">
+            <h3 className="text-lg font-semibold text-gray-100">
               Monthly Revenue
             </h3>
-            <div className="text-sm text-gray-500">Last 6 months</div>
+            <div className="text-sm text-gray-400">Last 6 months</div>
           </div>
           <div className="h-64">
             <Line data={generateMonthlyRevenueData()} options={chartOptions} />
@@ -702,12 +702,12 @@ export default function Dashboard() {
 
       {/* Product Categories Chart */}
       <div className="mb-8">
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+        <div className="bg-gray-800 border border-gray-700 rounded-xl shadow-sm p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">
+            <h3 className="text-lg font-semibold text-gray-100">
               Product Categories
             </h3>
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-gray-400">
               Distribution by category
             </div>
           </div>
@@ -722,7 +722,7 @@ export default function Dashboard() {
                     legend: {
                       position: "bottom",
                       labels: {
-                        color: "#374151",
+                        color: "#D1D5DB",
                         padding: 20,
                       },
                     },
@@ -757,11 +757,11 @@ export default function Dashboard() {
                             colors[index % colors.length]
                           }`}
                         ></div>
-                        <span className="text-gray-600 text-sm">
+                        <span className="text-gray-300 text-sm">
                           {category}
                         </span>
                       </div>
-                      <span className="text-gray-900 font-semibold">
+                      <span className="text-gray-100 font-semibold">
                         {count}
                       </span>
                     </div>
@@ -776,9 +776,9 @@ export default function Dashboard() {
       {/* Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Orders */}
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+        <div className="bg-gray-800 border border-gray-700 rounded-xl shadow-sm p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">
+            <h3 className="text-lg font-semibold text-gray-100">
               Recent Orders
             </h3>
             <button
@@ -793,7 +793,7 @@ export default function Dashboard() {
               stats.recentOrders.map((order) => (
                 <div
                   key={order._id}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
+                  className="flex items-center justify-between p-3 bg-gray-700 rounded-lg border border-gray-600"
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-[#6b4f3a] rounded-full flex items-center justify-center">
@@ -802,14 +802,14 @@ export default function Dashboard() {
                       </span>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-900">
+                      <p className="text-sm font-medium text-gray-100">
                         {order.shippingAddress.name}
                       </p>
-                      <p className="text-xs text-gray-500">#{order.orderId}</p>
+                      <p className="text-xs text-gray-400">#{order.orderId}</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-sm font-medium text-gray-100">
                       ₹{order.orderSummary?.total?.toLocaleString() || 0}
                     </p>
                     <span
@@ -824,7 +824,7 @@ export default function Dashboard() {
               ))
             ) : (
               <div className="text-center py-8">
-                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <div className="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-3">
                   <svg
                     className="w-6 h-6 text-gray-400"
                     fill="none"
@@ -839,16 +839,16 @@ export default function Dashboard() {
                     />
                   </svg>
                 </div>
-                <p className="text-gray-500 text-sm">No recent orders</p>
+                <p className="text-gray-400 text-sm">No recent orders</p>
               </div>
             )}
           </div>
         </div>
 
         {/* Low Stock Products */}
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+        <div className="bg-gray-800 border border-gray-700 rounded-xl shadow-sm p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">
+            <h3 className="text-lg font-semibold text-gray-100">
               Low Stock Alert
             </h3>
             <button
@@ -863,7 +863,7 @@ export default function Dashboard() {
               stats.lowStockProducts.slice(0, 5).map((product) => (
                 <div
                   key={product._id}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
+                  className="flex items-center justify-between p-3 bg-gray-700 rounded-lg border border-gray-600"
                 >
                   <div className="flex items-center gap-3">
                     {product.images && product.images.length > 0 ? (
@@ -890,10 +890,10 @@ export default function Dashboard() {
                       </div>
                     )}
                     <div>
-                      <p className="text-sm font-medium text-gray-900">
+                      <p className="text-sm font-medium text-gray-100">
                         {product.name}
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-400">
                         {product.category}
                       </p>
                     </div>
@@ -902,13 +902,13 @@ export default function Dashboard() {
                     <p className="text-sm font-medium text-red-600">
                       {product.stock} left
                     </p>
-                    <p className="text-xs text-gray-500">Low stock</p>
+                    <p className="text-xs text-gray-400">Low stock</p>
                   </div>
                 </div>
               ))
             ) : (
               <div className="text-center py-8">
-                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <div className="w-12 h-12 bg-green-800 rounded-full flex items-center justify-center mx-auto mb-3">
                   <svg
                     className="w-6 h-6 text-green-600"
                     fill="none"
@@ -923,7 +923,7 @@ export default function Dashboard() {
                     />
                   </svg>
                 </div>
-                <p className="text-gray-500 text-sm">
+                <p className="text-gray-400 text-sm">
                   All products well stocked
                 </p>
               </div>
@@ -934,9 +934,9 @@ export default function Dashboard() {
 
       {/* Top Customers */}
       {stats.topCustomers.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+        <div className="bg-gray-800 border border-gray-700 rounded-xl shadow-sm p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">
+            <h3 className="text-lg font-semibold text-gray-100">
               Top Customers
             </h3>
             <button
@@ -950,7 +950,7 @@ export default function Dashboard() {
             {stats.topCustomers.map((customer, index) => (
               <div
                 key={customer._id}
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
+                className="flex items-center justify-between p-3 bg-gray-700 rounded-lg border border-gray-600"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-[#6b4f3a] rounded-full flex items-center justify-center">
@@ -964,17 +964,17 @@ export default function Dashboard() {
                     </span>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-sm font-medium text-gray-100">
                       {customer.name}
                     </p>
-                    <p className="text-xs text-gray-500">{customer.email}</p>
+                    <p className="text-xs text-gray-400">{customer.email}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-medium text-gray-900">
+                  <p className="text-sm font-medium text-gray-100">
                     {customer.orderCount} orders
                   </p>
-                  <p className="text-xs text-gray-500">Loyal customer</p>
+                  <p className="text-xs text-gray-400">Loyal customer</p>
                 </div>
               </div>
             ))}
