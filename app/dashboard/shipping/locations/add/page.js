@@ -27,25 +27,20 @@ export default function AddZipCodePage() {
     }
 
     try {
-      const res = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-        }/api/shipping/add`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            zipCode,
-            charges: parseFloat(charge),
-            priceLessThan: parseFloat(priceLessThan),
-            state,
-            stateCode,
-            gstCode,
-          }),
-        }
-      );
+      const res = await fetch("/api/admin/shipping/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          zipCode,
+          charges: parseFloat(charge),
+          priceLessThan: parseFloat(priceLessThan),
+          state,
+          stateCode,
+          gstCode,
+        }),
+      });
 
       if (!res.ok) {
         throw new Error("Failed to create zip code");
@@ -85,7 +80,7 @@ export default function AddZipCodePage() {
               onChange={(e) => setZipCode(e.target.value)}
             />
           </div>
-          
+
           <div>
             <label
               htmlFor="charge"
@@ -102,7 +97,7 @@ export default function AddZipCodePage() {
               onChange={(e) => setCharge(e.target.value)}
             />
           </div>
-          
+
           <div>
             <label
               htmlFor="priceLessThan"
@@ -119,7 +114,7 @@ export default function AddZipCodePage() {
               onChange={(e) => setPriceLessThan(e.target.value)}
             />
           </div>
-          
+
           <div>
             <label
               htmlFor="state"
@@ -136,7 +131,7 @@ export default function AddZipCodePage() {
               onChange={(e) => setState(e.target.value)}
             />
           </div>
-          
+
           <div>
             <label
               htmlFor="stateCode"
@@ -153,7 +148,7 @@ export default function AddZipCodePage() {
               onChange={(e) => setStateCode(e.target.value)}
             />
           </div>
-          
+
           <div>
             <label
               htmlFor="gstCode"
@@ -171,14 +166,24 @@ export default function AddZipCodePage() {
             />
           </div>
         </div>
-        
+
         <div className="mt-8 flex justify-end space-x-4">
           <button
             onClick={() => router.push("/dashboard/shipping/locations")}
             className="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-6 py-3 rounded-lg hover:from-gray-600 hover:to-gray-700 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center gap-2"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
             Cancel
           </button>
@@ -186,8 +191,18 @@ export default function AddZipCodePage() {
             onClick={handleCreateZipCode}
             className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-3 rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center gap-2"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
             </svg>
             Create Zip Code
           </button>

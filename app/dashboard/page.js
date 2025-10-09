@@ -58,33 +58,38 @@ export default function Dashboard() {
   const fetchDashboardStats = async () => {
     try {
       // Fetch customers
-      const customersResponse = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-        }/api/admin/customers`,
-        { credentials: "include" }
-      );
+      const customersResponse = await fetch("/api/admin/customers", {
+        credentials: "include",
+      });
       let customers = [];
       if (customersResponse.ok) {
         const customersData = await customersResponse.json();
         console.log("Customers data:", customersData);
-        customers = Array.isArray(customersData) ? customersData : [];
+        // Local API returns: { success: true, data: { customers: [...] } }
+        if (
+          customersData.success &&
+          customersData.data &&
+          customersData.data.customers
+        ) {
+          customers = Array.isArray(customersData.data.customers)
+            ? customersData.data.customers
+            : [];
+        } else if (Array.isArray(customersData)) {
+          customers = customersData;
+        }
       } else {
         console.log("Customers API failed:", customersResponse.status);
       }
 
       // Fetch orders
-      const ordersResponse = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-        }/api/admin/orders`,
-        { credentials: "include" }
-      );
+      const ordersResponse = await fetch("/api/admin/orders", {
+        credentials: "include",
+      });
       let orders = [];
       if (ordersResponse.ok) {
         const ordersData = await ordersResponse.json();
         console.log("Orders data:", ordersData);
-        // Orders API returns nested structure: { success: true, data: { orders: [...] } }
+        // Admin API returns: { success: true, data: { orders: [...] } }
         if (ordersData.success && ordersData.data && ordersData.data.orders) {
           orders = Array.isArray(ordersData.data.orders)
             ? ordersData.data.orders
@@ -97,18 +102,23 @@ export default function Dashboard() {
       }
 
       // Fetch products
-      const productsResponse = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-        }/api/products`,
-        { credentials: "include" }
-      );
+      const productsResponse = await fetch("/api/products", {
+        credentials: "include",
+      });
       let products = [];
       if (productsResponse.ok) {
         const productsData = await productsResponse.json();
         console.log("Products data:", productsData);
-        // Products API returns: { products: [...] }
-        if (productsData.products) {
+        // Admin API returns: { success: true, data: { products: [...] } }
+        if (
+          productsData.success &&
+          productsData.data &&
+          productsData.data.products
+        ) {
+          products = Array.isArray(productsData.data.products)
+            ? productsData.data.products
+            : [];
+        } else if (productsData.products) {
           products = Array.isArray(productsData.products)
             ? productsData.products
             : [];

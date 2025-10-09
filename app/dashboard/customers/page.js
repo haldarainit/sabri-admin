@@ -21,7 +21,7 @@ export default function Customers() {
     if (!confirmed) return;
 
     try {
-      const url = `/api/admin/customers/${customerId}`;
+      const url = `/api/admin/customers?id=${customerId}`;
 
       console.log("🌐 Making DELETE request to:", url);
 
@@ -79,22 +79,24 @@ export default function Customers() {
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const response = await fetch(
-          `${
-            process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-          }/api/admin/customers`,
-          {
-            credentials: "include",
-          }
-        );
+        const response = await fetch("/api/admin/customers", {
+          credentials: "include",
+        });
 
         if (!response.ok) {
           throw new Error("Failed to fetch customers");
         }
 
-        const users = await response.json();
-        console.log("Fetched customers:", users); // Debug log
-        setCustomers(users || []);
+        const data = await response.json();
+        console.log("Fetched customers:", data); // Debug log
+        // Local API returns: { success: true, data: { customers: [...] } }
+        if (data.success && data.data && data.data.customers) {
+          setCustomers(data.data.customers || []);
+        } else if (Array.isArray(data)) {
+          setCustomers(data || []);
+        } else {
+          setCustomers([]);
+        }
       } catch (error) {
         console.error("Error fetching customers:", error);
         // Show error notification

@@ -45,9 +45,7 @@ export default function OrdersPage() {
         ...(status !== "all" && { status }),
       });
 
-      const baseURL =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-      const response = await fetch(`${baseURL}/api/admin/orders?${params}`, {
+      const response = await fetch(`/api/admin/orders?${params}`, {
         credentials: "include",
       });
 
@@ -82,19 +80,14 @@ export default function OrdersPage() {
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
       setUpdateStatusLoading(true);
-      const baseURL =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-      const response = await fetch(
-        `${baseURL}/api/admin/orders/${orderId}/status`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({ status: newStatus }),
-        }
-      );
+      const response = await fetch(`/api/admin/orders/${orderId}/status`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ status: newStatus }),
+      });
 
       const data = await response.json();
 
@@ -119,9 +112,7 @@ export default function OrdersPage() {
     if (!confirm("Are you sure you want to delete this order?")) return;
 
     try {
-      const baseURL =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-      const response = await fetch(`${baseURL}/api/admin/orders/${orderId}`, {
+      const response = await fetch(`/api/admin/orders/${orderId}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -143,15 +134,10 @@ export default function OrdersPage() {
   // Download invoice
   const downloadInvoice = async (orderId) => {
     try {
-      const baseURL =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-      const response = await fetch(
-        `${baseURL}/api/admin/orders/${orderId}/invoice`,
-        {
-          method: "GET",
-          credentials: "include",
-        }
-      );
+      const response = await fetch(`/api/admin/orders/${orderId}/invoice`, {
+        method: "GET",
+        credentials: "include",
+      });
 
       if (!response.ok) {
         throw new Error(`Failed to generate invoice: ${response.status}`);
@@ -268,12 +254,24 @@ export default function OrdersPage() {
                   disabled={updateStatusLoading}
                   className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent backdrop-blur-sm transition-all duration-300"
                 >
-                  <option value="pending" className="bg-gray-800">Pending</option>
-                  <option value="confirmed" className="bg-gray-800">Confirmed</option>
-                  <option value="processing" className="bg-gray-800">Processing</option>
-                  <option value="shipped" className="bg-gray-800">Shipped</option>
-                  <option value="delivered" className="bg-gray-800">Delivered</option>
-                  <option value="cancelled" className="bg-gray-800">Cancelled</option>
+                  <option value="pending" className="bg-gray-800">
+                    Pending
+                  </option>
+                  <option value="confirmed" className="bg-gray-800">
+                    Confirmed
+                  </option>
+                  <option value="processing" className="bg-gray-800">
+                    Processing
+                  </option>
+                  <option value="shipped" className="bg-gray-800">
+                    Shipped
+                  </option>
+                  <option value="delivered" className="bg-gray-800">
+                    Delivered
+                  </option>
+                  <option value="cancelled" className="bg-gray-800">
+                    Cancelled
+                  </option>
                 </select>
               </div>
             </div>
@@ -345,7 +343,9 @@ export default function OrdersPage() {
                           />
                         )}
                         <div>
-                          <p className="text-sm font-medium text-white">{item.name}</p>
+                          <p className="text-sm font-medium text-white">
+                            {item.name}
+                          </p>
                           <p className="text-xs text-gray-300">
                             {item.size && `Size: ${item.size}`}
                             {item.size && item.color && " • "}
@@ -376,7 +376,9 @@ export default function OrdersPage() {
               <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-lg p-4 space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-300">Subtotal:</span>
-                  <span className="text-white">₹{order.orderSummary.subtotal.toLocaleString()}</span>
+                  <span className="text-white">
+                    ₹{order.orderSummary.subtotal.toLocaleString()}
+                  </span>
                 </div>
                 {order.orderSummary.couponDiscount > 0 && (
                   <div className="flex justify-between text-sm text-green-300">
@@ -388,15 +390,21 @@ export default function OrdersPage() {
                 )}
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-300">Tax:</span>
-                  <span className="text-white">₹{order.orderSummary.tax.toFixed(0)}</span>
+                  <span className="text-white">
+                    ₹{order.orderSummary.tax.toFixed(0)}
+                  </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-300">Shipping:</span>
-                  <span className="text-white">₹{order.orderSummary.shippingCharge}</span>
+                  <span className="text-white">
+                    ₹{order.orderSummary.shippingCharge}
+                  </span>
                 </div>
                 <div className="border-t border-white/10 pt-2 flex justify-between font-medium">
                   <span className="text-white">Total:</span>
-                  <span className="text-white">₹{order.orderSummary.total.toLocaleString()}</span>
+                  <span className="text-white">
+                    ₹{order.orderSummary.total.toLocaleString()}
+                  </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-300">Payment Method:</span>
@@ -425,7 +433,10 @@ export default function OrdersPage() {
       {stats.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
           {stats.map((stat) => (
-            <div key={stat._id} className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl shadow-2xl p-4">
+            <div
+              key={stat._id}
+              className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl shadow-2xl p-4"
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs font-medium text-gray-300 uppercase tracking-wide">
@@ -466,13 +477,27 @@ export default function OrdersPage() {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="w-full px-3 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent backdrop-blur-sm transition-all duration-300"
             >
-              <option value="all" className="bg-gray-800">All Orders</option>
-              <option value="pending" className="bg-gray-800">Pending</option>
-              <option value="confirmed" className="bg-gray-800">Confirmed</option>
-              <option value="processing" className="bg-gray-800">Processing</option>
-              <option value="shipped" className="bg-gray-800">Shipped</option>
-              <option value="delivered" className="bg-gray-800">Delivered</option>
-              <option value="cancelled" className="bg-gray-800">Cancelled</option>
+              <option value="all" className="bg-gray-800">
+                All Orders
+              </option>
+              <option value="pending" className="bg-gray-800">
+                Pending
+              </option>
+              <option value="confirmed" className="bg-gray-800">
+                Confirmed
+              </option>
+              <option value="processing" className="bg-gray-800">
+                Processing
+              </option>
+              <option value="shipped" className="bg-gray-800">
+                Shipped
+              </option>
+              <option value="delivered" className="bg-gray-800">
+                Delivered
+              </option>
+              <option value="cancelled" className="bg-gray-800">
+                Cancelled
+              </option>
             </select>
           </div>
         </div>
@@ -525,7 +550,10 @@ export default function OrdersPage() {
                 </tr>
               ) : (
                 orders.map((order) => (
-                  <tr key={order._id} className="hover:bg-white/5 transition-all duration-300">
+                  <tr
+                    key={order._id}
+                    className="hover:bg-white/5 transition-all duration-300"
+                  >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
                         <p className="text-sm font-medium text-gray-200">
@@ -605,7 +633,9 @@ export default function OrdersPage() {
           <div className="bg-white/5 px-4 py-3 border-t border-white/10 sm:px-6">
             <div className="flex items-center justify-between">
               <div className="text-sm text-gray-300">
-                Page <span className="text-white font-medium">{currentPage}</span> of <span className="text-white font-medium">{totalPages}</span>
+                Page{" "}
+                <span className="text-white font-medium">{currentPage}</span> of{" "}
+                <span className="text-white font-medium">{totalPages}</span>
               </div>
               <div className="flex gap-2">
                 <button

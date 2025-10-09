@@ -17,15 +17,10 @@ export default function ViewProductsPage() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch(
-          `${
-            process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-          }/api/products`,
-          {
-            method: "GET",
-            credentials: "include",
-          }
-        );
+        const res = await fetch("/api/products", {
+          method: "GET",
+          credentials: "include",
+        });
 
         if (!res.ok) {
           throw new Error("Failed to fetch products");
@@ -63,15 +58,10 @@ export default function ViewProductsPage() {
     if (!confirmed) return;
 
     try {
-      const res = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-        }/api/products/${id}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      );
+      const res = await fetch(`/api/products/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
 
       if (!res.ok) {
         throw new Error("Failed to delete product");
@@ -111,21 +101,16 @@ export default function ViewProductsPage() {
   // Handle stock status update
   const handleStockUpdate = async (productId, newStockStatus) => {
     try {
-      const res = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-        }/api/products/${productId}`,
-        {
-          method: "PUT",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            stock: newStockStatus === "available" ? 10 : 0, // Set to 10 for available, 0 for unavailable
-          }),
-        }
-      );
+      const res = await fetch(`/api/products/${productId}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          stock: newStockStatus === "available" ? 10 : 0, // Set to 10 for available, 0 for unavailable
+        }),
+      });
 
       if (!res.ok) {
         throw new Error("Failed to update stock");
@@ -375,9 +360,15 @@ export default function ViewProductsPage() {
                     }}
                     className="px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent backdrop-blur-sm transition-all duration-300"
                   >
-                    <option value="" className="bg-gray-800">All Categories</option>
+                    <option value="" className="bg-gray-800">
+                      All Categories
+                    </option>
                     {categories.map((category) => (
-                      <option key={category} value={category} className="bg-gray-800">
+                      <option
+                        key={category}
+                        value={category}
+                        className="bg-gray-800"
+                      >
                         {category}
                       </option>
                     ))}
@@ -391,10 +382,18 @@ export default function ViewProductsPage() {
                     onChange={(e) => setSortBy(e.target.value)}
                     className="px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent backdrop-blur-sm transition-all duration-300"
                   >
-                    <option value="name" className="bg-gray-800">Sort by Name</option>
-                    <option value="price" className="bg-gray-800">Sort by Price</option>
-                    <option value="stock" className="bg-gray-800">Sort by Stock</option>
-                    <option value="category" className="bg-gray-800">Sort by Category</option>
+                    <option value="name" className="bg-gray-800">
+                      Sort by Name
+                    </option>
+                    <option value="price" className="bg-gray-800">
+                      Sort by Price
+                    </option>
+                    <option value="stock" className="bg-gray-800">
+                      Sort by Stock
+                    </option>
+                    <option value="category" className="bg-gray-800">
+                      Sort by Category
+                    </option>
                   </select>
                   <button
                     onClick={() =>
@@ -551,8 +550,15 @@ export default function ViewProductsPage() {
                               className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent backdrop-blur-sm transition-all duration-300"
                               title="Update Stock Status"
                             >
-                              <option value="available" className="bg-gray-800">Available</option>
-                              <option value="unavailable" className="bg-gray-800">Unavailable</option>
+                              <option value="available" className="bg-gray-800">
+                                Available
+                              </option>
+                              <option
+                                value="unavailable"
+                                className="bg-gray-800"
+                              >
+                                Unavailable
+                              </option>
                             </select>
 
                             <button
@@ -640,8 +646,13 @@ export default function ViewProductsPage() {
                     <div>
                       <p className="text-sm text-gray-300">
                         Showing page{" "}
-                        <span className="font-medium text-white">{currentPage}</span> of{" "}
-                        <span className="font-medium text-white">{totalPages}</span>
+                        <span className="font-medium text-white">
+                          {currentPage}
+                        </span>{" "}
+                        of{" "}
+                        <span className="font-medium text-white">
+                          {totalPages}
+                        </span>
                       </p>
                     </div>
                     <div>

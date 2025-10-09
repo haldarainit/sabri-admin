@@ -13,15 +13,10 @@ export default function DashboardLayout({ children }) {
   useEffect(() => {
     const verifyAdmin = async () => {
       try {
-        const res = await fetch(
-          `${
-            process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-          }/api/admin/me`,
-          {
-            method: "GET",
-            credentials: "include", // send cookies
-          }
-        );
+        const res = await fetch("/api/admin/me", {
+          method: "GET",
+          credentials: "include", // send cookies
+        });
 
         if (!res.ok) {
           router.push("/login");
@@ -61,15 +56,10 @@ export default function DashboardLayout({ children }) {
 
   const handleLogout = async () => {
     try {
-      await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-        }/api/admin/logout`,
-        {
-          method: "POST",
-          credentials: "include",
-        }
-      );
+      await fetch("/api/admin/logout", {
+        method: "POST",
+        credentials: "include",
+      });
     } catch (err) {
       console.error("Logout failed:", err);
     } finally {

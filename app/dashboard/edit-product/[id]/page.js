@@ -37,14 +37,9 @@ export default function EditProductPage() {
 
   const fetchProduct = useCallback(async () => {
     try {
-      const response = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-        }/api/products/${productId}`,
-        {
-          credentials: "include",
-        }
-      );
+      const response = await fetch(`/api/products/${productId}`, {
+        credentials: "include",
+      });
 
       if (!response.ok) {
         throw new Error("Failed to fetch product");
@@ -159,16 +154,11 @@ export default function EditProductPage() {
     );
 
     try {
-      const res = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-        }/api/products/${productId}`,
-        {
-          method: "PUT",
-          body: formData,
-          credentials: "include",
-        }
-      );
+      const res = await fetch(`/api/products/${productId}`, {
+        method: "PUT",
+        body: formData,
+        credentials: "include",
+      });
 
       if (!res.ok) {
         const errorData = await res
