@@ -79,7 +79,10 @@ export async function POST(request) {
             ];
 
             const missingFields = requiredFields.filter((field) => {
-              const value = row[field.toLowerCase()];
+              // Try both camelCase and lowercase versions
+              const camelCaseValue = row[field];
+              const lowerCaseValue = row[field.toLowerCase()];
+              const value = camelCaseValue || lowerCaseValue;
               return (
                 !value || (typeof value === "string" && value.trim() === "")
               );
@@ -95,7 +98,9 @@ export async function POST(request) {
 
             // Parse and validate data types
             const price = parseFloat(row.price);
-            const originalPrice = parseFloat(row.originalprice);
+            const originalPrice = parseFloat(
+              row.originalPrice || row.originalprice
+            );
             const discount = parseFloat(row.discount) || 0;
             const stock = parseInt(row.stock);
 
@@ -144,11 +149,13 @@ export async function POST(request) {
             // Parse specifications
             const specifications = {};
             if (row.material) specifications.material = row.material;
-            if (row.metaltype) specifications.metalType = row.metaltype;
+            if (row.metalType || row.metaltype)
+              specifications.metalType = row.metalType || row.metaltype;
             if (row.gemstone) specifications.gemstone = row.gemstone;
             if (row.dimensions) specifications.dimensions = row.dimensions;
-            if (row.careinstructions)
-              specifications.careInstructions = row.careinstructions;
+            if (row.careInstructions || row.careinstructions)
+              specifications.careInstructions =
+                row.careInstructions || row.careinstructions;
             if (row.warranty) specifications.warranty = row.warranty;
 
             // Create product object
@@ -162,24 +169,35 @@ export async function POST(request) {
               stock: stock,
               brand: row.brand || "Sabri",
               description: row.description,
-              shortDescription: row.shortdescription || "",
+              shortDescription:
+                row.shortDescription || row.shortdescription || "",
               sku: row.sku,
               specifications: specifications,
-              isNewArrival: parseBoolean(row.isnewarrival),
-              isBestSeller: parseBoolean(row.isbestseller),
-              isFeatured: parseBoolean(row.isfeatured),
-              isGiftable: parseBoolean(row.isgiftable),
-              isOnSale: parseBoolean(row.isonsale),
+              isNewArrival: parseBoolean(row.isNewArrival || row.isnewarrival),
+              isBestSeller: parseBoolean(row.isBestSeller || row.isbestseller),
+              isFeatured: parseBoolean(row.isFeatured || row.isfeatured),
+              isGiftable: parseBoolean(row.isGiftable || row.isgiftable),
+              isOnSale: parseBoolean(row.isOnSale || row.isonsale),
               men: parseBoolean(row.men),
               women: parseBoolean(row.women),
               kids: parseBoolean(row.kids),
               images: images,
               tags: [
-                ...(parseBoolean(row.isnewarrival) ? ["new-arrival"] : []),
-                ...(parseBoolean(row.isbestseller) ? ["best-seller"] : []),
-                ...(parseBoolean(row.isfeatured) ? ["featured"] : []),
-                ...(parseBoolean(row.isgiftable) ? ["giftable"] : []),
-                ...(parseBoolean(row.isonsale) ? ["on-sale"] : []),
+                ...(parseBoolean(row.isNewArrival || row.isnewarrival)
+                  ? ["new-arrival"]
+                  : []),
+                ...(parseBoolean(row.isBestSeller || row.isbestseller)
+                  ? ["best-seller"]
+                  : []),
+                ...(parseBoolean(row.isFeatured || row.isfeatured)
+                  ? ["featured"]
+                  : []),
+                ...(parseBoolean(row.isGiftable || row.isgiftable)
+                  ? ["giftable"]
+                  : []),
+                ...(parseBoolean(row.isOnSale || row.isonsale)
+                  ? ["on-sale"]
+                  : []),
                 ...(parseBoolean(row.men) ? ["men"] : []),
                 ...(parseBoolean(row.women) ? ["women"] : []),
                 ...(parseBoolean(row.kids) ? ["kids"] : []),
