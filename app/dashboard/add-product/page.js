@@ -6,20 +6,38 @@ export default function AddProductPage() {
   const [form, setForm] = useState({
     name: "",
     price: 0,
+    originalPrice: 0,
     category: "",
+    subcategory: "",
     stock: 0,
-    brand: "",
+    brand: "Sabri",
     description: "",
-    frameDimensions: "",
-    productInformation: "",
-    newArrival: false,
-    hotSeller: false,
+    shortDescription: "",
+    sku: "",
+    // Jewelry-specific fields
+    material: "",
+    metalType: "",
+    gemstone: "",
+    weight: "",
+    dimensions: "",
+    careInstructions: "",
+    warranty: "",
+    // Product flags
+    isNewArrival: false,
+    isBestSeller: false,
+    isFeatured: false,
+    isGiftable: true,
+    isOnSale: false,
+    discount: 0,
+    // Target audience
     men: false,
     women: false,
     kids: false,
   });
 
   const [images, setImages] = useState([]);
+  const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
+  const [uploading, setUploading] = useState(false);
   const [errors, setErrors] = useState({});
 
   // Bulk upload states
@@ -50,20 +68,62 @@ export default function AddProductPage() {
     }
   };
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const files = Array.from(e.target.files);
     if (files.length + images.length > 4) {
       alert("You can only upload up to 4 images");
       return;
     }
-    setImages([...images, ...files]);
 
-    // Clear image error if present
-    if (errors.images) {
+    setUploading(true);
+
+    try {
+      // Upload images to Cloudinary
+      const formData = new FormData();
+      files.forEach((file) => formData.append("images", file));
+      formData.append("folder", "sabri-jewelry");
+
+      const response = await fetch("/api/admin/upload-images", {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        const newImageUrls = result.data.map((img) => ({
+          url: img.url,
+          public_id: img.public_id,
+          alt: `Jewelry product image`,
+          isPrimary: uploadedImageUrls.length === 0, // First image is primary
+        }));
+
+        setUploadedImageUrls([...uploadedImageUrls, ...newImageUrls]);
+        setImages([...images, ...files]); // Keep original files for display
+
+        // Clear image error if present
+        if (errors.images) {
+          setErrors({
+            ...errors,
+            images: "",
+          });
+        }
+
+        if (result.errors && result.errors.length > 0) {
+          console.warn("Some uploads had issues:", result.errors);
+        }
+      } else {
+        throw new Error(result.message || "Failed to upload images");
+      }
+    } catch (error) {
+      console.error("Image upload error:", error);
       setErrors({
         ...errors,
-        images: "",
+        images: error.message || "Failed to upload images",
       });
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -79,7 +139,11 @@ export default function AddProductPage() {
     if (!form.brand.trim()) newErrors.brand = "Brand is required";
     if (!form.description.trim())
       newErrors.description = "Description is required";
-    if (images.length === 0)
+    if (!form.sku.trim()) newErrors.sku = "SKU is required";
+    if (!form.material.trim()) newErrors.material = "Material is required";
+    if (!form.metalType.trim()) newErrors.metalType = "Metal type is required";
+    if (!form.weight.trim()) newErrors.weight = "Weight is required";
+    if (uploadedImageUrls.length === 0)
       newErrors.images = "At least one image is required";
 
     setErrors(newErrors);
@@ -96,10 +160,46 @@ export default function AddProductPage() {
 
     // Preparing form data for backend (with images)
     const formData = new FormData();
-    Object.keys(form).forEach((key) => {
-      formData.append(key, form[key]);
-    });
-    images.forEach((img) => formData.append("images", img));
+
+    // Basic product fields
+    formData.append("name", form.name);
+    formData.append("price", form.price);
+    formData.append("originalPrice", form.originalPrice || "");
+    formData.append("discount", form.discount || 0);
+    formData.append("category", form.category);
+    formData.append("subcategory", form.subcategory || "");
+    formData.append("stock", form.stock);
+    formData.append("brand", form.brand);
+    formData.append("description", form.description);
+    formData.append("shortDescription", form.shortDescription || "");
+    formData.append("sku", form.sku);
+
+    // Jewelry specifications
+    formData.append(
+      "specifications",
+      JSON.stringify({
+        material: form.material,
+        metalType: form.metalType,
+        gemstone: form.gemstone || "",
+        weight: form.weight,
+        dimensions: form.dimensions || "",
+        careInstructions: form.careInstructions || "",
+        warranty: form.warranty || "",
+      })
+    );
+
+    // Product flags
+    formData.append("isNewArrival", form.isNewArrival);
+    formData.append("isBestSeller", form.isBestSeller);
+    formData.append("isFeatured", form.isFeatured);
+    formData.append("isGiftable", form.isGiftable);
+    formData.append("isOnSale", form.isOnSale);
+    formData.append("men", form.men);
+    formData.append("women", form.women);
+    formData.append("kids", form.kids);
+
+    // Images (use Cloudinary URLs)
+    formData.append("images", JSON.stringify(uploadedImageUrls));
 
     try {
       const res = await fetch(`/api/products`, {
@@ -216,7 +316,7 @@ export default function AddProductPage() {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = "product_upload_template.csv";
+        a.download = "jewelry_products_template.csv";
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -310,6 +410,7 @@ export default function AddProductPage() {
     bulkImageFiles.forEach((file) => {
       formData.append("images", file);
     });
+    formData.append("folder", "sabri-jewelry-bulk");
 
     try {
       // Simulate progress updates
@@ -323,7 +424,7 @@ export default function AddProductPage() {
         });
       }, 100);
 
-      const res = await fetch(`/api/products/bulk-upload-images`, {
+      const res = await fetch(`/api/admin/upload-images`, {
         method: "POST",
         body: formData,
         credentials: "include",
@@ -334,20 +435,26 @@ export default function AddProductPage() {
 
       const result = await res.json();
 
-      if (res.ok) {
+      if (res.ok && result.success) {
         setBulkImageResult({
           success: true,
-          message: result.message,
-          uploadedImages: result.uploadedImages,
+          message: `${
+            result.totalUploaded || result.data.length
+          } images uploaded successfully to Cloudinary`,
+          uploadedImages: result.data,
           errors: result.errors || [],
-          summary: result.summary,
+          summary: {
+            total: bulkImageFiles.length,
+            uploaded: result.totalUploaded || result.data.length,
+            failed: result.totalFailed || 0,
+          },
         });
         setBulkImageFiles([]);
         setBulkImageUploadProgress(0);
       } else {
         setBulkImageResult({
           success: false,
-          message: result.message,
+          message: result.message || "Failed to upload images to Cloudinary",
           errors: result.errors || [],
         });
       }
@@ -433,9 +540,12 @@ export default function AddProductPage() {
           </svg>
         </span>
         <div>
-          <h2 className="text-2xl font-bold text-white">Add New Product</h2>
+          <h2 className="text-2xl font-bold text-white">
+            Add New Jewelry Product
+          </h2>
           <p className="text-sm text-gray-400">
-            Create a single product or use the bulk tools below.
+            Create a single jewelry product or use the bulk tools below. Perfect
+            for necklaces, earrings, rings, bracelets, and more.
           </p>
         </div>
       </div>
@@ -489,8 +599,9 @@ export default function AddProductPage() {
             </h3>
           </div>
           <p className="text-sm text-gray-300 mb-4">
-            Upload multiple products at once using a CSV file. Make sure your
-            CSV follows the required format.
+            Upload multiple jewelry products at once using a CSV file. Perfect
+            for adding large collections of necklaces, earrings, rings, and
+            other jewelry items. Make sure your CSV follows the required format.
           </p>
 
           {/* Format Instructions */}
@@ -517,16 +628,25 @@ export default function AddProductPage() {
             <ul className="text-xs text-gray-300 space-y-1">
               <li>
                 • Required fields: name, price, category, stock, brand,
-                description
+                description, sku, material, metalType, weight
               </li>
               <li>
-                • Boolean fields (newArrival, hotSeller, men, women, kids): use
-                "true" or "false"
+                • Optional fields: originalPrice, discount, subcategory,
+                gemstone, dimensions, careInstructions, warranty
               </li>
               <li>
-                • Multiple images: separate URLs with "|" (pipe symbol), not
-                commas
+                • Categories: necklaces, earrings, rings, bracelets, fine-gold,
+                fine-silver, mens, gifts
               </li>
+              <li>
+                • Metal types: sterling-silver, gold-plated, rhodium-plated,
+                stainless-steel, brass
+              </li>
+              <li>
+                • Boolean fields (isNewArrival, isBestSeller, isFeatured,
+                isGiftable, isOnSale, men, women, kids): use "true" or "false"
+              </li>
+              <li>• Multiple images: separate URLs with "|" (pipe symbol)</li>
               <li>• Example: https://image1.jpg|https://image2.jpg</li>
             </ul>
           </div>
@@ -553,7 +673,7 @@ export default function AddProductPage() {
                     d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M7.5 12l4.5 4.5L16.5 12M12 3v13.5"
                   />
                 </svg>
-                <span>Download CSV Template</span>
+                <span>Download Jewelry CSV Template</span>
               </button>
             </div>
 
@@ -696,8 +816,9 @@ export default function AddProductPage() {
             </h3>
           </div>
           <p className="text-sm text-gray-300 mb-4">
-            Upload multiple images to Cloudinary and get URLs to use in your CSV
-            files. You can add images one by one or select multiple at once.
+            Upload multiple jewelry images to Cloudinary and get optimized URLs
+            to use in your CSV files. Images are automatically optimized for web
+            delivery. You can add images one by one or select multiple at once.
             Maximum 50 images total.
           </p>
 
@@ -1094,20 +1215,43 @@ export default function AddProductPage() {
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Category *
             </label>
-            <input
-              type="text"
+            <select
               name="category"
-              placeholder="e.g., Sunglasses"
               value={form.category}
               onChange={handleChange}
               className={`w-full p-3 border rounded-lg bg-gray-700 text-white ${
                 errors.category ? "border-red-500" : "border-gray-600"
               }`}
               required
-            />
+            >
+              <option value="">Select Category</option>
+              <option value="necklaces">Necklaces</option>
+              <option value="earrings">Earrings</option>
+              <option value="rings">Rings</option>
+              <option value="bracelets">Bracelets</option>
+              <option value="fine-gold">Fine Gold</option>
+              <option value="fine-silver">Fine Silver</option>
+              <option value="mens">Men's Collection</option>
+              <option value="gifts">Gifts</option>
+            </select>
             {errors.category && (
               <p className="text-red-500 text-sm mt-1">{errors.category}</p>
             )}
+          </div>
+
+          {/* Subcategory */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Subcategory
+            </label>
+            <input
+              type="text"
+              name="subcategory"
+              placeholder="e.g., Wedding Rings, Stud Earrings"
+              value={form.subcategory}
+              onChange={handleChange}
+              className="w-full p-3 border border-gray-600 rounded-lg bg-gray-700 text-white"
+            />
           </div>
 
           {/* Stock */}
@@ -1132,6 +1276,27 @@ export default function AddProductPage() {
             )}
           </div>
 
+          {/* SKU */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              SKU (Product Code) *
+            </label>
+            <input
+              type="text"
+              name="sku"
+              placeholder="e.g., NECK001, EARR001"
+              value={form.sku}
+              onChange={handleChange}
+              className={`w-full p-3 border rounded-lg bg-gray-700 text-white ${
+                errors.sku ? "border-red-500" : "border-gray-600"
+              }`}
+              required
+            />
+            {errors.sku && (
+              <p className="text-red-500 text-sm mt-1">{errors.sku}</p>
+            )}
+          </div>
+
           {/* Brand */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -1140,7 +1305,7 @@ export default function AddProductPage() {
             <input
               type="text"
               name="brand"
-              placeholder="e.g., Ray-Ban"
+              placeholder="e.g., Sabri"
               value={form.brand}
               onChange={handleChange}
               className={`w-full p-3 border rounded-lg bg-gray-700 text-white ${
@@ -1160,7 +1325,7 @@ export default function AddProductPage() {
             </label>
             <textarea
               name="description"
-              placeholder="e.g., Classic aviator sunglasses with premium UV protection and durable metal frame..."
+              placeholder="e.g., Elegant pearl drop necklace for special occasions. Handcrafted with premium materials and attention to detail..."
               value={form.description}
               onChange={handleChange}
               className={`w-full p-3 border rounded-lg bg-gray-700 text-white ${
@@ -1174,34 +1339,157 @@ export default function AddProductPage() {
             )}
           </div>
 
-          {/* Frame Dimensions */}
+          {/* Short Description */}
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              Frame Dimensions
+              Short Description
             </label>
-            <input
-              type="text"
-              name="frameDimensions"
-              placeholder="e.g., 58-14-140 mm"
-              value={form.frameDimensions}
+            <textarea
+              name="shortDescription"
+              placeholder="e.g., Elegant pearl drop necklace"
+              value={form.shortDescription}
               onChange={handleChange}
               className="w-full p-3 border border-gray-600 bg-gray-700 text-white rounded-lg"
+              rows={2}
             />
           </div>
 
-          {/* Product Information */}
+          {/* Jewelry Specifications */}
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Product Information
-            </label>
-            <textarea
-              name="productInformation"
-              placeholder="e.g., Material: Metal frame, Glass lenses. Features: UV400 protection, Anti-reflective coating..."
-              value={form.productInformation}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-600 bg-gray-700 text-white rounded-lg"
-              rows={3}
-            />
+            <h3 className="text-lg font-semibold text-white mb-4">
+              Jewelry Specifications
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Material */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Material *
+                </label>
+                <input
+                  type="text"
+                  name="material"
+                  placeholder="e.g., Pearl, Diamond, Gold"
+                  value={form.material}
+                  onChange={handleChange}
+                  className={`w-full p-3 border rounded-lg bg-gray-700 text-white ${
+                    errors.material ? "border-red-500" : "border-gray-600"
+                  }`}
+                  required
+                />
+                {errors.material && (
+                  <p className="text-red-500 text-sm mt-1">{errors.material}</p>
+                )}
+              </div>
+
+              {/* Metal Type */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Metal Type *
+                </label>
+                <select
+                  name="metalType"
+                  value={form.metalType}
+                  onChange={handleChange}
+                  className={`w-full p-3 border rounded-lg bg-gray-700 text-white ${
+                    errors.metalType ? "border-red-500" : "border-gray-600"
+                  }`}
+                  required
+                >
+                  <option value="">Select Metal Type</option>
+                  <option value="sterling-silver">Sterling Silver</option>
+                  <option value="gold-plated">Gold Plated</option>
+                  <option value="rhodium-plated">Rhodium Plated</option>
+                  <option value="stainless-steel">Stainless Steel</option>
+                  <option value="brass">Brass</option>
+                </select>
+                {errors.metalType && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.metalType}
+                  </p>
+                )}
+              </div>
+
+              {/* Gemstone */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Gemstone
+                </label>
+                <input
+                  type="text"
+                  name="gemstone"
+                  placeholder="e.g., Diamond, Pearl, Ruby"
+                  value={form.gemstone}
+                  onChange={handleChange}
+                  className="w-full p-3 border border-gray-600 rounded-lg bg-gray-700 text-white"
+                />
+              </div>
+
+              {/* Weight */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Weight *
+                </label>
+                <input
+                  type="text"
+                  name="weight"
+                  placeholder="e.g., 15g, 8g"
+                  value={form.weight}
+                  onChange={handleChange}
+                  className={`w-full p-3 border rounded-lg bg-gray-700 text-white ${
+                    errors.weight ? "border-red-500" : "border-gray-600"
+                  }`}
+                  required
+                />
+                {errors.weight && (
+                  <p className="text-red-500 text-sm mt-1">{errors.weight}</p>
+                )}
+              </div>
+
+              {/* Dimensions */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Dimensions
+                </label>
+                <input
+                  type="text"
+                  name="dimensions"
+                  placeholder="e.g., 45cm chain length, 6mm studs"
+                  value={form.dimensions}
+                  onChange={handleChange}
+                  className="w-full p-3 border border-gray-600 rounded-lg bg-gray-700 text-white"
+                />
+              </div>
+
+              {/* Care Instructions */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Care Instructions
+                </label>
+                <input
+                  type="text"
+                  name="careInstructions"
+                  placeholder="e.g., Store in dry place, avoid contact with perfumes"
+                  value={form.careInstructions}
+                  onChange={handleChange}
+                  className="w-full p-3 border border-gray-600 rounded-lg bg-gray-700 text-white"
+                />
+              </div>
+
+              {/* Warranty */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Warranty
+                </label>
+                <input
+                  type="text"
+                  name="warranty"
+                  placeholder="e.g., 1 year, 2 years, Lifetime"
+                  value={form.warranty}
+                  onChange={handleChange}
+                  className="w-full p-3 border border-gray-600 rounded-lg bg-gray-700 text-white"
+                />
+              </div>
+            </div>
           </div>
 
           {/* Images */}
@@ -1221,39 +1509,144 @@ export default function AddProductPage() {
             {errors.images && (
               <p className="text-red-500 text-sm mt-1">{errors.images}</p>
             )}
-            <div className="flex gap-2 mt-2">
-              {images.map((img, i) => (
-                <div key={i} className="relative">
+
+            {/* Upload Progress */}
+            {uploading && (
+              <div className="mt-2 p-3 bg-blue-900/50 border border-blue-600 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-400"></div>
+                  <span className="text-sm text-blue-300">
+                    Uploading images to Cloudinary...
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Image Previews */}
+            <div className="flex gap-2 mt-2 flex-wrap">
+              {uploadedImageUrls.map((img, i) => (
+                <div key={i} className="relative group">
                   <img
-                    src={URL.createObjectURL(img)}
-                    alt="preview"
+                    src={img.url}
+                    alt={img.alt}
                     className="w-20 h-20 object-cover rounded border border-gray-600"
                   />
+                  {img.isPrimary && (
+                    <div className="absolute top-1 left-1 bg-green-600 text-white text-xs px-1 rounded">
+                      Primary
+                    </div>
+                  )}
                   <button
                     type="button"
-                    onClick={() =>
-                      setImages(images.filter((_, index) => index !== i))
-                    }
-                    className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 text-xs"
+                    onClick={() => {
+                      setUploadedImageUrls(
+                        uploadedImageUrls.filter((_, index) => index !== i)
+                      );
+                      setImages(images.filter((_, index) => index !== i));
+                    }}
+                    className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     ×
                   </button>
                 </div>
               ))}
+
+              {/* Upload more button */}
+              {uploadedImageUrls.length < 4 && !uploading && (
+                <label className="w-20 h-20 border-2 border-dashed border-gray-600 rounded-lg flex items-center justify-center cursor-pointer hover:border-gray-500 transition-colors">
+                  <svg
+                    className="w-6 h-6 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 4v16m8-8H4"
+                    />
+                  </svg>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                </label>
+              )}
+            </div>
+
+            {/* Image Upload Info */}
+            <div className="mt-2 text-xs text-gray-400">
+              <p>• Upload high-quality jewelry images (JPEG, PNG, WebP)</p>
+              <p>• Maximum 4 images per product</p>
+              <p>
+                • Images are automatically optimized and stored on Cloudinary
+              </p>
             </div>
           </div>
 
-          {/* Categories */}
+          {/* Pricing Options */}
+          <div className="md:col-span-2">
+            <h3 className="text-lg font-semibold text-white mb-4">
+              Pricing & Sales
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Original Price */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Original Price (Optional)
+                </label>
+                <input
+                  type="number"
+                  name="originalPrice"
+                  placeholder="e.g., 5999"
+                  value={form.originalPrice}
+                  onChange={handleChange}
+                  className="w-full p-3 border border-gray-600 rounded-lg bg-gray-700 text-white"
+                  min="0"
+                  step="0.01"
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  Leave empty if no discount. Used to show "was ₹X, now ₹Y"
+                </p>
+              </div>
+
+              {/* Discount Percentage */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Discount Percentage
+                </label>
+                <input
+                  type="number"
+                  name="discount"
+                  placeholder="e.g., 33"
+                  value={form.discount}
+                  onChange={handleChange}
+                  className="w-full p-3 border border-gray-600 rounded-lg bg-gray-700 text-white"
+                  min="0"
+                  max="100"
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  Auto-calculated if original price is set
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Product Categories */}
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-300 mb-3">
-              Product Categories
+              Product Categories & Flags
             </label>
             <div className="grid grid-cols-2 gap-3">
               <label className="flex items-center gap-2 p-2 border border-gray-600 rounded-lg hover:bg-gray-700 text-white">
                 <input
                   type="checkbox"
-                  name="newArrival"
-                  checked={form.newArrival}
+                  name="isNewArrival"
+                  checked={form.isNewArrival}
                   onChange={handleChange}
                   className="text-blue-500"
                 />
@@ -1263,12 +1656,45 @@ export default function AddProductPage() {
               <label className="flex items-center gap-2 p-2 border border-gray-600 rounded-lg hover:bg-gray-700 text-white">
                 <input
                   type="checkbox"
-                  name="hotSeller"
-                  checked={form.hotSeller}
+                  name="isBestSeller"
+                  checked={form.isBestSeller}
                   onChange={handleChange}
                   className="text-blue-500"
                 />
-                <span>Hot Seller</span>
+                <span>Best Seller</span>
+              </label>
+
+              <label className="flex items-center gap-2 p-2 border border-gray-600 rounded-lg hover:bg-gray-700 text-white">
+                <input
+                  type="checkbox"
+                  name="isFeatured"
+                  checked={form.isFeatured}
+                  onChange={handleChange}
+                  className="text-blue-500"
+                />
+                <span>Featured</span>
+              </label>
+
+              <label className="flex items-center gap-2 p-2 border border-gray-600 rounded-lg hover:bg-gray-700 text-white">
+                <input
+                  type="checkbox"
+                  name="isGiftable"
+                  checked={form.isGiftable}
+                  onChange={handleChange}
+                  className="text-blue-500"
+                />
+                <span>Giftable</span>
+              </label>
+
+              <label className="flex items-center gap-2 p-2 border border-gray-600 rounded-lg hover:bg-gray-700 text-white">
+                <input
+                  type="checkbox"
+                  name="isOnSale"
+                  checked={form.isOnSale}
+                  onChange={handleChange}
+                  className="text-blue-500"
+                />
+                <span>On Sale</span>
               </label>
 
               <label className="flex items-center gap-2 p-2 border border-gray-600 rounded-lg hover:bg-gray-700 text-white">
@@ -1279,7 +1705,7 @@ export default function AddProductPage() {
                   onChange={handleChange}
                   className="text-blue-500"
                 />
-                <span>Men</span>
+                <span>Men's Collection</span>
               </label>
 
               <label className="flex items-center gap-2 p-2 border border-gray-600 rounded-lg hover:bg-gray-700 text-white">
@@ -1290,7 +1716,7 @@ export default function AddProductPage() {
                   onChange={handleChange}
                   className="text-blue-500"
                 />
-                <span>Women</span>
+                <span>Women's Collection</span>
               </label>
 
               <label className="flex items-center gap-2 p-2 border border-gray-600 rounded-lg hover:bg-gray-700 text-white">
@@ -1301,7 +1727,7 @@ export default function AddProductPage() {
                   onChange={handleChange}
                   className="text-blue-500"
                 />
-                <span>Kids</span>
+                <span>Kids' Collection</span>
               </label>
             </div>
           </div>

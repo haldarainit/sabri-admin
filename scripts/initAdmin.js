@@ -4,13 +4,12 @@ import dotenv from "dotenv";
 import Admin from "../lib/models/Admin.js";
 
 // Load environment variables
-dotenv.config({ path: ".env.local" });
+dotenv.config();
 
 const initAdmin = async () => {
   try {
     // Connect to database
-    const mongoUri =
-      "mongodb+srv://haldarainit_db_user:1Q4nQwMJI9ohOvce@cluster0.5uicr6o.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+    const mongoUri = process.env.MONGODB_URI;
     console.log(
       "Connecting to MongoDB with URI:",
       mongoUri.substring(0, 20) + "..."
