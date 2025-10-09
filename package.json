@@ -2,14 +2,13 @@
   "name": "admin",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
-    "backend": "node backend/server.js",
-    "backend:dev": "nodemon backend/server.js",
-    "init-admin": "node backend/scripts/initAdmin.js"
+    "init-admin": "node scripts/initAdmin.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",

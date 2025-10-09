@@ -1,17 +1,21 @@
-const mongoose = require("mongoose");
-const dotenv = require("dotenv");
-const path = require("path");
-const Admin = require("../models/Admin");
+import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
+import dotenv from "dotenv";
+import Admin from "../lib/models/Admin.js";
 
 // Load environment variables
-dotenv.config({ path: path.join(__dirname, "../.env") });
+dotenv.config({ path: ".env.local" });
 
 const initAdmin = async () => {
   try {
     // Connect to database
-    await mongoose.connect(
-      process.env.MONGODB_URI || "mongodb://localhost:27017/sabri-admin"
+    const mongoUri =
+      "mongodb+srv://haldarainit_db_user:1Q4nQwMJI9ohOvce@cluster0.5uicr6o.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+    console.log(
+      "Connecting to MongoDB with URI:",
+      mongoUri.substring(0, 20) + "..."
     );
+    await mongoose.connect(mongoUri);
     console.log("Connected to database");
 
     // Check if admin already exists

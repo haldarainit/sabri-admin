@@ -17,17 +17,14 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/admin/login`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include", // ✅ important to send/receive cookies
-          body: JSON.stringify({ email, password }),
-        }
-      );
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // ✅ important to send/receive cookies
+        body: JSON.stringify({ email, password }),
+      });
 
       const data = await res.json();
 

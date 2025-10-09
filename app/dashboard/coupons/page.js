@@ -23,12 +23,9 @@ export default function Coupons() {
   const fetchCoupons = async () => {
     try {
       setLoading(true);
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/admin/coupons`,
-        {
-          credentials: "include",
-        }
-      );
+      const response = await fetch(`/api/admin/coupons`, {
+        credentials: "include",
+      });
       const data = await response.json();
       if (data.success) {
         console.log("Fetched coupons:", data.data);
@@ -75,17 +72,14 @@ export default function Coupons() {
             : null,
       };
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/admin/coupons`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify(couponData), // Use couponData instead of formData
-        }
-      );
+      const response = await fetch(`/api/admin/coupons`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(couponData), // Use couponData instead of formData
+      });
 
       const data = await response.json();
       if (data.success) {
@@ -135,17 +129,14 @@ export default function Coupons() {
 
       console.log("Updating coupon data:", couponData);
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/admin/coupons/${editingCoupon._id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify(couponData), // Use couponData instead of formData
-        }
-      );
+      const response = await fetch(`/api/admin/coupons/${editingCoupon._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(couponData), // Use couponData instead of formData
+      });
 
       const data = await response.json();
       if (data.success) {
@@ -177,13 +168,10 @@ export default function Coupons() {
   const handleDeleteCoupon = async (id) => {
     if (confirm("Are you sure you want to delete this coupon?")) {
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/admin/coupons/${id}`,
-          {
-            method: "DELETE",
-            credentials: "include",
-          }
-        );
+        const response = await fetch(`/api/admin/coupons/${id}`, {
+          method: "DELETE",
+          credentials: "include",
+        });
 
         const data = await response.json();
         if (data.success) {

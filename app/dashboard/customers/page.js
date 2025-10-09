@@ -21,7 +21,7 @@ export default function Customers() {
     if (!confirmed) return;
 
     try {
-      const url = `${process.env.NEXT_PUBLIC_API_URL}/api/admin/customers/${customerId}`;
+      const url = `/api/admin/customers/${customerId}`;
 
       console.log("🌐 Making DELETE request to:", url);
 
