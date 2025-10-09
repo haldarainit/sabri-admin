@@ -124,11 +124,20 @@ export async function POST(request) {
     }
 
     // Validate required fields
-    if (!name || !price || !category || !stock || !description || !sku) {
+    if (
+      !name ||
+      !price ||
+      !originalPrice ||
+      !category ||
+      !stock ||
+      !description ||
+      !sku
+    ) {
       return NextResponse.json(
         {
           success: false,
-          message: "Missing required fields",
+          message:
+            "Missing required fields (name, price, originalPrice, category, stock, description, sku)",
         },
         { status: 400 }
       );

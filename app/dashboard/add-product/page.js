@@ -18,7 +18,6 @@ export default function AddProductPage() {
     material: "",
     metalType: "",
     gemstone: "",
-    weight: "",
     dimensions: "",
     careInstructions: "",
     warranty: "",
@@ -88,7 +87,9 @@ export default function AddProductPage() {
 
     if (!form.name.trim()) newErrors.name = "Product name is required";
     if (!form.price || form.price <= 0)
-      newErrors.price = "Valid price is required";
+      newErrors.price = "Valid selling price is required";
+    if (!form.originalPrice || form.originalPrice <= 0)
+      newErrors.originalPrice = "Valid original price is required";
     if (!form.category.trim()) newErrors.category = "Category is required";
     if (!form.stock || form.stock < 0)
       newErrors.stock = "Valid stock quantity is required";
@@ -98,7 +99,6 @@ export default function AddProductPage() {
     if (!form.sku.trim()) newErrors.sku = "SKU is required";
     if (!form.material.trim()) newErrors.material = "Material is required";
     if (!form.metalType.trim()) newErrors.metalType = "Metal type is required";
-    if (!form.weight.trim()) newErrors.weight = "Weight is required";
     if (images.length === 0)
       newErrors.images = "At least one image is required";
 
@@ -137,7 +137,6 @@ export default function AddProductPage() {
         material: form.material,
         metalType: form.metalType,
         gemstone: form.gemstone || "",
-        weight: form.weight,
         dimensions: form.dimensions || "",
         careInstructions: form.careInstructions || "",
         warranty: form.warranty || "",
@@ -190,7 +189,6 @@ export default function AddProductPage() {
         material: "",
         metalType: "",
         gemstone: "",
-        weight: "",
         dimensions: "",
         careInstructions: "",
         warranty: "",
@@ -597,7 +595,7 @@ export default function AddProductPage() {
             <ul className="text-xs text-gray-300 space-y-1">
               <li>
                 • Required fields: name, price, category, stock, brand,
-                description, sku, material, metalType, weight
+                description, sku, material, metalType
               </li>
               <li>
                 • Optional fields: originalPrice, discount, subcategory,
@@ -1156,29 +1154,6 @@ export default function AddProductPage() {
             )}
           </div>
 
-          {/* Price */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Price *
-            </label>
-            <input
-              type="number"
-              name="price"
-              placeholder="e.g., 150"
-              value={form.price}
-              onChange={handleChange}
-              className={`w-full p-3 border rounded-lg bg-gray-700 text-white ${
-                errors.price ? "border-red-500" : "border-gray-600"
-              }`}
-              min="0"
-              step="0.01"
-              required
-            />
-            {errors.price && (
-              <p className="text-red-500 text-sm mt-1">{errors.price}</p>
-            )}
-          </div>
-
           {/* Category */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -1393,27 +1368,6 @@ export default function AddProductPage() {
                 />
               </div>
 
-              {/* Weight */}
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Weight *
-                </label>
-                <input
-                  type="text"
-                  name="weight"
-                  placeholder="e.g., 15g, 8g"
-                  value={form.weight}
-                  onChange={handleChange}
-                  className={`w-full p-3 border rounded-lg bg-gray-700 text-white ${
-                    errors.weight ? "border-red-500" : "border-gray-600"
-                  }`}
-                  required
-                />
-                {errors.weight && (
-                  <p className="text-red-500 text-sm mt-1">{errors.weight}</p>
-                )}
-              </div>
-
               {/* Dimensions */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -1542,16 +1496,16 @@ export default function AddProductPage() {
             </div>
           </div>
 
-          {/* Pricing Options */}
+          {/* Pricing Section */}
           <div className="md:col-span-2">
             <h3 className="text-lg font-semibold text-white mb-4">
-              Pricing & Sales
+              Pricing Information
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Original Price */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Original Price (Optional)
+                  Original Price *
                 </label>
                 <input
                   type="number"
@@ -1562,32 +1516,72 @@ export default function AddProductPage() {
                   className="w-full p-3 border border-gray-600 rounded-lg bg-gray-700 text-white"
                   min="0"
                   step="0.01"
+                  required
                 />
                 <p className="text-xs text-gray-400 mt-1">
-                  Leave empty if no discount. Used to show "was ₹X, now ₹Y"
+                  The original cost price of the product
                 </p>
               </div>
 
-              {/* Discount Percentage */}
+              {/* Our Price */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Discount Percentage
+                  Our Selling Price *
                 </label>
                 <input
                   type="number"
-                  name="discount"
-                  placeholder="e.g., 33"
-                  value={form.discount}
+                  name="price"
+                  placeholder="e.g., 3999"
+                  value={form.price}
                   onChange={handleChange}
                   className="w-full p-3 border border-gray-600 rounded-lg bg-gray-700 text-white"
                   min="0"
-                  max="100"
+                  step="0.01"
+                  required
                 />
                 <p className="text-xs text-gray-400 mt-1">
-                  Auto-calculated if original price is set
+                  The price we sell to customers
                 </p>
               </div>
             </div>
+
+            {/* Margin Calculation */}
+            {form.originalPrice > 0 && form.price > 0 && (
+              <div className="mt-4 p-4 bg-gray-700/50 rounded-lg border border-gray-600">
+                <h4 className="text-sm font-medium text-gray-300 mb-2">
+                  Profit Margin Calculation
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <span className="text-gray-400">Gross Profit:</span>
+                    <span className="text-green-400 font-medium ml-2">
+                      ₹{(form.price - form.originalPrice).toFixed(2)}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-400">Profit Margin:</span>
+                    <span className="text-green-400 font-medium ml-2">
+                      {(
+                        ((form.price - form.originalPrice) /
+                          form.originalPrice) *
+                        100
+                      ).toFixed(1)}
+                      %
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-400">Markup:</span>
+                    <span className="text-blue-400 font-medium ml-2">
+                      {(
+                        ((form.price - form.originalPrice) / form.price) *
+                        100
+                      ).toFixed(1)}
+                      %
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Product Categories */}

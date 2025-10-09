@@ -71,6 +71,7 @@ export async function POST(request) {
             const requiredFields = [
               "name",
               "price",
+              "originalPrice",
               "category",
               "stock",
               "description",
@@ -94,14 +95,22 @@ export async function POST(request) {
 
             // Parse and validate data types
             const price = parseFloat(row.price);
-            const originalPrice = parseFloat(row.originalprice) || 0;
+            const originalPrice = parseFloat(row.originalprice);
             const discount = parseFloat(row.discount) || 0;
             const stock = parseInt(row.stock);
 
             if (isNaN(price) || price <= 0) {
               errors.push({
                 row: rowIndex,
-                message: "Invalid price value",
+                message: "Invalid selling price value",
+              });
+              return;
+            }
+
+            if (isNaN(originalPrice) || originalPrice <= 0) {
+              errors.push({
+                row: rowIndex,
+                message: "Invalid original price value",
               });
               return;
             }
@@ -137,7 +146,6 @@ export async function POST(request) {
             if (row.material) specifications.material = row.material;
             if (row.metaltype) specifications.metalType = row.metaltype;
             if (row.gemstone) specifications.gemstone = row.gemstone;
-            if (row.weight) specifications.weight = row.weight;
             if (row.dimensions) specifications.dimensions = row.dimensions;
             if (row.careinstructions)
               specifications.careInstructions = row.careinstructions;
