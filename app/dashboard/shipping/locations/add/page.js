@@ -13,16 +13,52 @@ export default function AddZipCodePage() {
   const [gstCode, setGstCode] = useState("");
 
   const handleCreateZipCode = async () => {
-    // Basic validation
-    if (
-      !zipCode ||
-      !charge ||
-      !priceLessThan ||
-      !state ||
-      !stateCode ||
-      !gstCode
+    // Comprehensive validation
+    const errors = [];
+
+    // Check required fields
+    if (!zipCode || zipCode.trim() === "") {
+      errors.push("Zip code is required");
+    } else if (zipCode.length > 10) {
+      errors.push("Zip code cannot exceed 10 characters");
+    }
+
+    if (!charge || charge === "") {
+      errors.push("Shipping charge is required");
+    } else if (isNaN(parseFloat(charge)) || parseFloat(charge) < 0) {
+      errors.push("Shipping charge must be a valid positive number");
+    }
+
+    if (!priceLessThan || priceLessThan === "") {
+      errors.push("Price threshold is required");
+    } else if (
+      isNaN(parseFloat(priceLessThan)) ||
+      parseFloat(priceLessThan) < 0
     ) {
-      alert("Please fill in all fields.");
+      errors.push("Price threshold must be a valid positive number");
+    }
+
+    if (!state || state.trim() === "") {
+      errors.push("State is required");
+    } else if (state.length > 50) {
+      errors.push("State name cannot exceed 50 characters");
+    }
+
+    if (!stateCode || stateCode.trim() === "") {
+      errors.push("State code is required");
+    } else if (stateCode.length > 5) {
+      errors.push("State code cannot exceed 5 characters");
+    }
+
+    if (!gstCode || gstCode.trim() === "") {
+      errors.push("GST code is required");
+    } else if (gstCode.length > 10) {
+      errors.push("GST code cannot exceed 10 characters");
+    }
+
+    // Show validation errors if any
+    if (errors.length > 0) {
+      alert("Please fix the following errors:\n\n" + errors.join("\n"));
       return;
     }
 
@@ -42,8 +78,16 @@ export default function AddZipCodePage() {
         }),
       });
 
-      if (!res.ok) {
-        throw new Error("Failed to create zip code");
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        // Handle validation errors specifically
+        if (data.errors && Array.isArray(data.errors)) {
+          alert("Validation failed:\n\n" + data.errors.join("\n"));
+        } else {
+          throw new Error(data.message || "Failed to create zip code");
+        }
+        return;
       }
 
       alert("Zip Code Created Successfully!");
@@ -52,7 +96,7 @@ export default function AddZipCodePage() {
       router.push("/dashboard/shipping/locations");
     } catch (error) {
       console.error("Error creating zip code:", error);
-      alert("Failed to create zip code. Please try again.");
+      alert(error.message || "Failed to create zip code. Please try again.");
     }
   };
 
@@ -75,9 +119,10 @@ export default function AddZipCodePage() {
               type="text"
               id="zipCode"
               className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent backdrop-blur-sm transition-all duration-300"
-              placeholder="Enter zip code"
+              placeholder="Enter zip code (max 10 characters)"
               value={zipCode}
-              onChange={(e) => setZipCode(e.target.value)}
+              onChange={(e) => setZipCode(e.target.value.slice(0, 10))}
+              maxLength={10}
             />
           </div>
 
@@ -92,9 +137,11 @@ export default function AddZipCodePage() {
               type="number"
               id="charge"
               className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent backdrop-blur-sm transition-all duration-300"
-              placeholder="Enter shipping charge"
+              placeholder="Enter shipping charge (₹)"
               value={charge}
               onChange={(e) => setCharge(e.target.value)}
+              min="0"
+              step="0.01"
             />
           </div>
 
@@ -109,9 +156,11 @@ export default function AddZipCodePage() {
               type="number"
               id="priceLessThan"
               className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent backdrop-blur-sm transition-all duration-300"
-              placeholder="Enter price threshold"
+              placeholder="Enter price threshold (₹)"
               value={priceLessThan}
               onChange={(e) => setPriceLessThan(e.target.value)}
+              min="0"
+              step="0.01"
             />
           </div>
 
@@ -126,9 +175,10 @@ export default function AddZipCodePage() {
               type="text"
               id="state"
               className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent backdrop-blur-sm transition-all duration-300"
-              placeholder="Enter state name"
+              placeholder="Enter state name (max 50 characters)"
               value={state}
-              onChange={(e) => setState(e.target.value)}
+              onChange={(e) => setState(e.target.value.slice(0, 50))}
+              maxLength={50}
             />
           </div>
 
@@ -143,9 +193,12 @@ export default function AddZipCodePage() {
               type="text"
               id="stateCode"
               className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent backdrop-blur-sm transition-all duration-300"
-              placeholder="Enter state code"
+              placeholder="Enter state code (max 5 characters)"
               value={stateCode}
-              onChange={(e) => setStateCode(e.target.value)}
+              onChange={(e) =>
+                setStateCode(e.target.value.slice(0, 5).toUpperCase())
+              }
+              maxLength={5}
             />
           </div>
 
@@ -160,9 +213,10 @@ export default function AddZipCodePage() {
               type="text"
               id="gstCode"
               className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent backdrop-blur-sm transition-all duration-300"
-              placeholder="Enter GST code"
+              placeholder="Enter GST code (max 10 characters)"
               value={gstCode}
-              onChange={(e) => setGstCode(e.target.value)}
+              onChange={(e) => setGstCode(e.target.value.slice(0, 10))}
+              maxLength={10}
             />
           </div>
         </div>

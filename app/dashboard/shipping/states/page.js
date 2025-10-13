@@ -17,26 +17,30 @@ export default function StatesPage() {
       }
       const data = await res.json();
 
-      // Extract unique states from shipping data
-      const uniqueStates = data.reduce((acc, current) => {
-        const existing = acc.find(
-          (item) =>
-            item.state === current.state &&
-            item.stateCode === current.stateCode &&
-            item.gstCode === current.gstCode
-        );
-        if (!existing) {
-          acc.push({
-            _id: current._id,
-            state: current.state,
-            stateCode: current.stateCode,
-            gstCode: current.gstCode,
-          });
-        }
-        return acc;
-      }, []);
+      if (data.success) {
+        // Extract unique states from shipping data
+        const uniqueStates = data.data.reduce((acc, current) => {
+          const existing = acc.find(
+            (item) =>
+              item.state === current.state &&
+              item.stateCode === current.stateCode &&
+              item.gstCode === current.gstCode
+          );
+          if (!existing) {
+            acc.push({
+              _id: current._id,
+              state: current.state,
+              stateCode: current.stateCode,
+              gstCode: current.gstCode,
+            });
+          }
+          return acc;
+        }, []);
 
-      setStates(uniqueStates);
+        setStates(uniqueStates);
+      } else {
+        throw new Error(data.message || "Failed to fetch shipping data");
+      }
     } catch (error) {
       console.error("Error fetching states from shipping data:", error);
       // Optionally, show an error message to the user

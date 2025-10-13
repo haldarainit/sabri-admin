@@ -53,12 +53,6 @@ const initAdmin = async () => {
           update: true,
           delete: true,
         },
-        staff: {
-          create: true,
-          read: true,
-          update: true,
-          delete: true,
-        },
       },
     });
 

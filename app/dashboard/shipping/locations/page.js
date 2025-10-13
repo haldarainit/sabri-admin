@@ -18,7 +18,11 @@ export default function ShippingLocationsPage() {
         throw new Error("Failed to fetch zip codes");
       }
       const data = await res.json();
-      setZipCodes(data);
+      if (data.success) {
+        setZipCodes(data.data || []);
+      } else {
+        throw new Error(data.message || "Failed to fetch zip codes");
+      }
     } catch (error) {
       console.error("Error fetching zip codes:", error);
       // Optionally, show an error message to the user
