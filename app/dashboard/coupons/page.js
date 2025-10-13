@@ -4,6 +4,12 @@ import { useState, useEffect } from "react";
 export default function Coupons() {
   const [loading, setLoading] = useState(true);
   const [coupons, setCoupons] = useState([]);
+  const [stats, setStats] = useState({
+    totalCoupons: 0,
+    activeCoupons: 0,
+    scheduledCoupons: 0,
+    expiredCoupons: 0,
+  });
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingCoupon, setEditingCoupon] = useState(null);
@@ -29,7 +35,15 @@ export default function Coupons() {
       const data = await response.json();
       if (data.success) {
         console.log("Fetched coupons:", data.data);
-        setCoupons(data.data);
+        setCoupons(data.data.coupons || []);
+        setStats(
+          data.data.stats || {
+            totalCoupons: 0,
+            activeCoupons: 0,
+            scheduledCoupons: 0,
+            expiredCoupons: 0,
+          }
+        );
       }
     } catch (error) {
       console.error("Error fetching coupons:", error);
@@ -256,7 +270,7 @@ export default function Coupons() {
             Total Coupons
           </h3>
           <p className="text-2xl sm:text-3xl font-bold text-blue-400">
-            {coupons.length}
+            {stats.totalCoupons}
           </p>
         </div>
         <div className="bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 text-center border border-gray-700">
@@ -264,12 +278,7 @@ export default function Coupons() {
             Active Coupons
           </h3>
           <p className="text-2xl sm:text-3xl font-bold text-green-400">
-            {
-              coupons.filter(
-                (coupon) =>
-                  coupon.isActive && !isExpired(coupon) && !isScheduled(coupon)
-              ).length
-            }
+            {stats.activeCoupons}
           </p>
         </div>
         <div className="bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 text-center border border-gray-700">
@@ -277,7 +286,7 @@ export default function Coupons() {
             Scheduled Coupons
           </h3>
           <p className="text-2xl sm:text-3xl font-bold text-yellow-400">
-            {coupons.filter((coupon) => isScheduled(coupon)).length}
+            {stats.scheduledCoupons}
           </p>
         </div>
         <div className="bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 text-center border border-gray-700">
@@ -285,7 +294,7 @@ export default function Coupons() {
             Expired Coupons
           </h3>
           <p className="text-2xl sm:text-3xl font-bold text-red-400">
-            {coupons.filter((coupon) => isExpired(coupon)).length}
+            {stats.expiredCoupons}
           </p>
         </div>
       </div>
