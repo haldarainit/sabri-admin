@@ -43,6 +43,8 @@ export default function EditProductPage() {
   const [existingImages, setExistingImages] = useState([]);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(true);
+  const [draggedIndex, setDraggedIndex] = useState(null);
+  const [dragOverIndex, setDragOverIndex] = useState(null);
 
   const fetchProduct = useCallback(async () => {
     try {
@@ -140,6 +142,83 @@ export default function EditProductPage() {
 
   const removeExistingImage = (index) => {
     setExistingImages(existingImages.filter((_, i) => i !== index));
+  };
+
+  // Drag and drop handlers for existing images
+  const handleDragStart = (e, index) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", "");
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
+  const handleDragOver = (e, index) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    setDragOverIndex(index);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverIndex(null);
+  };
+
+  const handleDrop = (e, dropIndex) => {
+    e.preventDefault();
+    if (draggedIndex !== null && draggedIndex !== dropIndex) {
+      const newImages = [...existingImages];
+      const draggedImage = newImages[draggedIndex];
+      newImages.splice(draggedIndex, 1);
+      newImages.splice(dropIndex, 0, draggedImage);
+      setExistingImages(newImages);
+    }
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
+  // Drag and drop handlers for new images
+  const handleNewImageDragStart = (e, index) => {
+    setDraggedIndex(existingImages.length + index);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", "");
+  };
+
+  const handleNewImageDragEnd = () => {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
+  const handleNewImageDragOver = (e, index) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    setDragOverIndex(existingImages.length + index);
+  };
+
+  const handleNewImageDragLeave = () => {
+    setDragOverIndex(null);
+  };
+
+  const handleNewImageDrop = (e, dropIndex) => {
+    e.preventDefault();
+    const actualDropIndex = existingImages.length + dropIndex;
+    if (draggedIndex !== null && draggedIndex !== actualDropIndex) {
+      if (draggedIndex >= existingImages.length) {
+        // Dragging from new images to new images
+        const newImages = [...images];
+        const draggedImage = newImages[draggedIndex - existingImages.length];
+        newImages.splice(draggedIndex - existingImages.length, 1);
+        newImages.splice(dropIndex, 0, draggedImage);
+        setImages(newImages);
+      } else {
+        // Dragging from existing images to new images (not allowed)
+        console.log("Cannot move existing image to new images section");
+      }
+    }
+    setDraggedIndex(null);
+    setDragOverIndex(null);
   };
 
   const validateForm = () => {
@@ -624,19 +703,42 @@ export default function EditProductPage() {
             {/* Existing Images */}
             {existingImages.length > 0 && (
               <div className="mb-4">
-                <p className="text-sm text-gray-600 mb-2">Current Images:</p>
+                <p className="text-sm text-gray-600 mb-2">
+                  Current Images:{" "}
+                  <span className="text-xs text-gray-500">
+                    (Drag to reorder)
+                  </span>
+                </p>
                 <div className="flex gap-2 flex-wrap">
                   {existingImages.map((img, i) => (
-                    <div key={i} className="relative">
+                    <div
+                      key={i}
+                      className={`relative ${
+                        draggedIndex === i ? "opacity-50" : ""
+                      } ${
+                        dragOverIndex === i && draggedIndex !== i
+                          ? "ring-2 ring-blue-500 ring-opacity-50"
+                          : ""
+                      }`}
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, i)}
+                      onDragEnd={handleDragEnd}
+                      onDragOver={(e) => handleDragOver(e, i)}
+                      onDragLeave={handleDragLeave}
+                      onDrop={(e) => handleDrop(e, i)}
+                    >
                       <img
                         src={typeof img === "string" ? img : img.url}
                         alt="existing"
-                        className="w-20 h-20 object-cover rounded border"
+                        className="w-20 h-20 object-cover rounded border cursor-move hover:scale-105 transition-transform"
                       />
+                      <div className="absolute top-1 left-1 bg-blue-500 text-white text-xs px-1 rounded">
+                        {i + 1}
+                      </div>
                       <button
                         type="button"
                         onClick={() => removeExistingImage(i)}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 text-xs"
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 text-xs hover:bg-red-600 transition-colors"
                       >
                         ×
                       </button>
@@ -663,19 +765,45 @@ export default function EditProductPage() {
             {/* New Images Preview */}
             {images.length > 0 && (
               <div className="mt-2">
-                <p className="text-sm text-gray-600 mb-2">New Images:</p>
+                <p className="text-sm text-gray-600 mb-2">
+                  New Images:{" "}
+                  <span className="text-xs text-gray-500">
+                    (Drag to reorder)
+                  </span>
+                </p>
                 <div className="flex gap-2 flex-wrap">
                   {images.map((img, i) => (
-                    <div key={i} className="relative">
+                    <div
+                      key={i}
+                      className={`relative ${
+                        draggedIndex === existingImages.length + i
+                          ? "opacity-50"
+                          : ""
+                      } ${
+                        dragOverIndex === existingImages.length + i &&
+                        draggedIndex !== existingImages.length + i
+                          ? "ring-2 ring-blue-500 ring-opacity-50"
+                          : ""
+                      }`}
+                      draggable
+                      onDragStart={(e) => handleNewImageDragStart(e, i)}
+                      onDragEnd={handleNewImageDragEnd}
+                      onDragOver={(e) => handleNewImageDragOver(e, i)}
+                      onDragLeave={handleNewImageDragLeave}
+                      onDrop={(e) => handleNewImageDrop(e, i)}
+                    >
                       <img
                         src={URL.createObjectURL(img)}
                         alt="preview"
-                        className="w-20 h-20 object-cover rounded border"
+                        className="w-20 h-20 object-cover rounded border cursor-move hover:scale-105 transition-transform"
                       />
+                      <div className="absolute top-1 left-1 bg-green-500 text-white text-xs px-1 rounded">
+                        {existingImages.length + i + 1}
+                      </div>
                       <button
                         type="button"
                         onClick={() => removeNewImage(i)}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 text-xs"
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 text-xs hover:bg-red-600 transition-colors"
                       >
                         ×
                       </button>
