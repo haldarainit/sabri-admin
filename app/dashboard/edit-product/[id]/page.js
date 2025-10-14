@@ -217,9 +217,10 @@ export default function EditProductPage() {
     images.forEach((img) => formData.append("images", img));
 
     // Add existing images URLs (to keep them)
-    existingImages.forEach((img) =>
-      formData.append("existingImages", JSON.stringify(img))
-    );
+    existingImages.forEach((img) => {
+      const imageUrl = typeof img === "string" ? img : img.url || img;
+      formData.append("existingImages", imageUrl);
+    });
 
     try {
       const res = await fetch(`/api/products/${productId}`, {

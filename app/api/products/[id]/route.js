@@ -76,12 +76,22 @@ export async function PUT(request, { params }) {
     const women = formData.get("women") === "true";
     const kids = formData.get("kids") === "true";
 
-    // Handle image uploads to Cloudinary (only if new images are provided)
+    // Handle image uploads to Cloudinary
     const imageFiles = formData.getAll("images");
+    const existingImagesParam = formData.getAll("existingImages");
     let images = [];
 
+    // Process existing images that should be kept
+    if (existingImagesParam && existingImagesParam.length > 0) {
+      for (const existingImg of existingImagesParam) {
+        if (existingImg && existingImg.trim()) {
+          images.push(existingImg);
+        }
+      }
+    }
+
+    // Add new uploaded images
     if (imageFiles && imageFiles.length > 0 && imageFiles[0].size > 0) {
-      // Upload new images to Cloudinary
       for (const file of imageFiles) {
         if (file && file.size > 0) {
           const uploadResult = await uploadToCloudinary(file, "sabri-jewelry");
@@ -92,12 +102,17 @@ export async function PUT(request, { params }) {
           }
         }
       }
-    } else {
-      // Keep existing images
-      const existingProduct = await Product.findById(id);
-      if (existingProduct) {
-        images = existingProduct.images || [];
-      }
+    }
+
+    // Ensure we have at least one image
+    if (images.length === 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "At least one image is required",
+        },
+        { status: 400 }
+      );
     }
 
     // Validate required fields
