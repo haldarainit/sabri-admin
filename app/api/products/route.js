@@ -13,26 +13,38 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page")) || 1;
     const limit = parseInt(searchParams.get("limit")) || 10;
+    const getAll = searchParams.get("getAll") === "true";
     const skip = (page - 1) * limit;
 
-    const products = await Product.find({})
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
+    let products;
+    let total;
 
-    const total = await Product.countDocuments();
+    if (getAll) {
+      // Fetch all products without pagination
+      products = await Product.find({}).sort({ createdAt: -1 });
+      total = products.length;
+    } else {
+      // Fetch products with pagination
+      products = await Product.find({})
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
+      total = await Product.countDocuments();
+    }
 
     return NextResponse.json({
       success: true,
       data: {
         products,
-        pagination: {
-          currentPage: page,
-          totalPages: Math.ceil(total / limit),
-          totalProducts: total,
-          hasNextPage: page < Math.ceil(total / limit),
-          hasPrevPage: page > 1,
-        },
+        pagination: getAll
+          ? null
+          : {
+              currentPage: page,
+              totalPages: Math.ceil(total / limit),
+              totalProducts: total,
+              hasNextPage: page < Math.ceil(total / limit),
+              hasPrevPage: page > 1,
+            },
       },
     });
   } catch (error) {

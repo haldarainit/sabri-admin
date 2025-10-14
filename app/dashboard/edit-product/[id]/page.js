@@ -16,25 +16,26 @@ export default function EditProductPage() {
     category: "",
     subcategory: "",
     stock: 0,
-    brand: "",
+    brand: "Sabri",
     description: "",
     shortDescription: "",
     sku: "",
-    specifications: {
-      material: "",
-      metalType: "",
-      gemstone: "",
-      dimensions: "",
-      careInstructions: "",
-      warranty: "",
-    },
+    // Jewelry-specific fields (matching add product structure)
+    material: "",
+    metalType: "",
+    gemstone: "",
+    dimensions: "",
+    careInstructions: "",
+    warranty: "",
+    // Product flags
     isNewArrival: false,
     isBestSeller: false,
     isFeatured: false,
     isGiftable: true,
     isOnSale: false,
+    // Target audience
     men: false,
-    women: true,
+    women: false,
     kids: false,
   });
 
@@ -42,12 +43,6 @@ export default function EditProductPage() {
   const [existingImages, setExistingImages] = useState([]);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (productId) {
-      fetchProduct();
-    }
-  }, [productId, fetchProduct]);
 
   const fetchProduct = useCallback(async () => {
     try {
@@ -69,18 +64,17 @@ export default function EditProductPage() {
         category: product.category || "",
         subcategory: product.subcategory || "",
         stock: product.stock || 0,
-        brand: product.brand || "",
+        brand: product.brand || "Sabri",
         description: product.description || "",
         shortDescription: product.shortDescription || "",
         sku: product.sku || "",
-        specifications: product.specifications || {
-          material: "",
-          metalType: "",
-          gemstone: "",
-          dimensions: "",
-          careInstructions: "",
-          warranty: "",
-        },
+        // Extract specifications to top level (matching add product structure)
+        material: product.specifications?.material || "",
+        metalType: product.specifications?.metalType || "",
+        gemstone: product.specifications?.gemstone || "",
+        dimensions: product.specifications?.dimensions || "",
+        careInstructions: product.specifications?.careInstructions || "",
+        warranty: product.specifications?.warranty || "",
         isNewArrival: product.isNewArrival || false,
         isBestSeller: product.isBestSeller || false,
         isFeatured: product.isFeatured || false,
@@ -88,7 +82,7 @@ export default function EditProductPage() {
           product.isGiftable !== undefined ? product.isGiftable : true,
         isOnSale: product.isOnSale || false,
         men: product.men || false,
-        women: product.women !== undefined ? product.women : true,
+        women: product.women !== undefined ? product.women : false,
         kids: product.kids || false,
       });
       setExistingImages(product.images || []);
@@ -100,6 +94,12 @@ export default function EditProductPage() {
       setLoading(false);
     }
   }, [productId, router]);
+
+  useEffect(() => {
+    if (productId) {
+      fetchProduct();
+    }
+  }, [productId, fetchProduct]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -147,7 +147,7 @@ export default function EditProductPage() {
 
     if (!form.name.trim()) newErrors.name = "Product name is required";
     if (!form.price || form.price <= 0)
-      newErrors.price = "Valid price is required";
+      newErrors.price = "Valid selling price is required";
     if (!form.originalPrice || form.originalPrice <= 0)
       newErrors.originalPrice = "Valid original price is required";
     if (!form.category.trim()) newErrors.category = "Category is required";
@@ -157,6 +157,8 @@ export default function EditProductPage() {
     if (!form.description.trim())
       newErrors.description = "Description is required";
     if (!form.sku.trim()) newErrors.sku = "SKU is required";
+    if (!form.material.trim()) newErrors.material = "Material is required";
+    if (!form.metalType.trim()) newErrors.metalType = "Metal type is required";
     if (images.length + existingImages.length === 0)
       newErrors.images = "At least one image is required";
 
@@ -174,13 +176,42 @@ export default function EditProductPage() {
 
     // Preparing form data for backend (with images)
     const formData = new FormData();
-    Object.keys(form).forEach((key) => {
-      if (key === "specifications") {
-        formData.append(key, JSON.stringify(form[key]));
-      } else {
-        formData.append(key, form[key]);
-      }
-    });
+
+    // Basic product fields
+    formData.append("name", form.name);
+    formData.append("price", form.price);
+    formData.append("originalPrice", form.originalPrice || "");
+    formData.append("discount", form.discount || 0);
+    formData.append("category", form.category);
+    formData.append("subcategory", form.subcategory || "");
+    formData.append("stock", form.stock);
+    formData.append("brand", form.brand);
+    formData.append("description", form.description);
+    formData.append("shortDescription", form.shortDescription || "");
+    formData.append("sku", form.sku);
+
+    // Jewelry specifications (matching add product structure)
+    formData.append(
+      "specifications",
+      JSON.stringify({
+        material: form.material,
+        metalType: form.metalType,
+        gemstone: form.gemstone || "",
+        dimensions: form.dimensions || "",
+        careInstructions: form.careInstructions || "",
+        warranty: form.warranty || "",
+      })
+    );
+
+    // Product flags
+    formData.append("isNewArrival", form.isNewArrival);
+    formData.append("isBestSeller", form.isBestSeller);
+    formData.append("isFeatured", form.isFeatured);
+    formData.append("isGiftable", form.isGiftable);
+    formData.append("isOnSale", form.isOnSale);
+    formData.append("men", form.men);
+    formData.append("women", form.women);
+    formData.append("kids", form.kids);
 
     // Add new images
     images.forEach((img) => formData.append("images", img));
@@ -477,53 +508,56 @@ export default function EditProductPage() {
             </div>
           </div>
 
-          {/* Specifications */}
+          {/* Jewelry Specifications */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              Product Specifications
-            </label>
+            <h3 className="text-lg font-semibold text-gray-700 mb-4">
+              Jewelry Specifications
+            </h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-600 mb-1">
-                  Material
+                  Material *
                 </label>
                 <input
                   type="text"
-                  name="specifications.material"
-                  placeholder="e.g., 18K Gold"
-                  value={form.specifications.material}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      specifications: {
-                        ...form.specifications,
-                        material: e.target.value,
-                      },
-                    })
-                  }
-                  className="w-full p-2 border border-gray-300 rounded-lg"
+                  name="material"
+                  placeholder="e.g., Pearl, Diamond, Gold"
+                  value={form.material}
+                  onChange={handleChange}
+                  className={`w-full p-3 border rounded-lg ${
+                    errors.material ? "border-red-500" : "border-gray-300"
+                  }`}
+                  required
                 />
+                {errors.material && (
+                  <p className="text-red-500 text-sm mt-1">{errors.material}</p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-600 mb-1">
-                  Metal Type
+                  Metal Type *
                 </label>
-                <input
-                  type="text"
-                  name="specifications.metalType"
-                  placeholder="e.g., Yellow Gold"
-                  value={form.specifications.metalType}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      specifications: {
-                        ...form.specifications,
-                        metalType: e.target.value,
-                      },
-                    })
-                  }
-                  className="w-full p-2 border border-gray-300 rounded-lg"
-                />
+                <select
+                  name="metalType"
+                  value={form.metalType}
+                  onChange={handleChange}
+                  className={`w-full p-3 border rounded-lg ${
+                    errors.metalType ? "border-red-500" : "border-gray-300"
+                  }`}
+                  required
+                >
+                  <option value="">Select Metal Type</option>
+                  <option value="sterling-silver">Sterling Silver</option>
+                  <option value="gold-plated">Gold Plated</option>
+                  <option value="rhodium-plated">Rhodium Plated</option>
+                  <option value="stainless-steel">Stainless Steel</option>
+                  <option value="brass">Brass</option>
+                </select>
+                {errors.metalType && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.metalType}
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-600 mb-1">
@@ -531,19 +565,11 @@ export default function EditProductPage() {
                 </label>
                 <input
                   type="text"
-                  name="specifications.gemstone"
-                  placeholder="e.g., Diamond"
-                  value={form.specifications.gemstone}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      specifications: {
-                        ...form.specifications,
-                        gemstone: e.target.value,
-                      },
-                    })
-                  }
-                  className="w-full p-2 border border-gray-300 rounded-lg"
+                  name="gemstone"
+                  placeholder="e.g., Diamond, Pearl, Ruby"
+                  value={form.gemstone}
+                  onChange={handleChange}
+                  className="w-full p-3 border border-gray-300 rounded-lg"
                 />
               </div>
               <div>
@@ -552,19 +578,11 @@ export default function EditProductPage() {
                 </label>
                 <input
                   type="text"
-                  name="specifications.dimensions"
-                  placeholder="e.g., 6mm width"
-                  value={form.specifications.dimensions}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      specifications: {
-                        ...form.specifications,
-                        dimensions: e.target.value,
-                      },
-                    })
-                  }
-                  className="w-full p-2 border border-gray-300 rounded-lg"
+                  name="dimensions"
+                  placeholder="e.g., 45cm chain length, 6mm studs"
+                  value={form.dimensions}
+                  onChange={handleChange}
+                  className="w-full p-3 border border-gray-300 rounded-lg"
                 />
               </div>
               <div>
@@ -573,19 +591,11 @@ export default function EditProductPage() {
                 </label>
                 <input
                   type="text"
-                  name="specifications.careInstructions"
-                  placeholder="e.g., Clean with soft cloth"
-                  value={form.specifications.careInstructions}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      specifications: {
-                        ...form.specifications,
-                        careInstructions: e.target.value,
-                      },
-                    })
-                  }
-                  className="w-full p-2 border border-gray-300 rounded-lg"
+                  name="careInstructions"
+                  placeholder="e.g., Store in dry place, avoid contact with perfumes"
+                  value={form.careInstructions}
+                  onChange={handleChange}
+                  className="w-full p-3 border border-gray-300 rounded-lg"
                 />
               </div>
               <div>
@@ -594,19 +604,11 @@ export default function EditProductPage() {
                 </label>
                 <input
                   type="text"
-                  name="specifications.warranty"
-                  placeholder="e.g., 1 year"
-                  value={form.specifications.warranty}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      specifications: {
-                        ...form.specifications,
-                        warranty: e.target.value,
-                      },
-                    })
-                  }
-                  className="w-full p-2 border border-gray-300 rounded-lg"
+                  name="warranty"
+                  placeholder="e.g., 1 year, 2 years, Lifetime"
+                  value={form.warranty}
+                  onChange={handleChange}
+                  className="w-full p-3 border border-gray-300 rounded-lg"
                 />
               </div>
             </div>
@@ -683,10 +685,10 @@ export default function EditProductPage() {
             )}
           </div>
 
-          {/* Product Flags */}
+          {/* Product Categories */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">
-              Product Flags
+              Product Categories & Flags
             </label>
             <div className="grid grid-cols-2 gap-3">
               <label className="flex items-center gap-2 p-2 border rounded-lg hover:bg-gray-50">
@@ -743,15 +745,7 @@ export default function EditProductPage() {
                 />
                 <span>On Sale</span>
               </label>
-            </div>
-          </div>
 
-          {/* Target Audience */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              Target Audience
-            </label>
-            <div className="grid grid-cols-3 gap-3">
               <label className="flex items-center gap-2 p-2 border rounded-lg hover:bg-gray-50">
                 <input
                   type="checkbox"
@@ -760,7 +754,7 @@ export default function EditProductPage() {
                   onChange={handleChange}
                   className="text-blue-600"
                 />
-                <span>Men</span>
+                <span>Men's Collection</span>
               </label>
 
               <label className="flex items-center gap-2 p-2 border rounded-lg hover:bg-gray-50">
@@ -771,7 +765,7 @@ export default function EditProductPage() {
                   onChange={handleChange}
                   className="text-blue-600"
                 />
-                <span>Women</span>
+                <span>Women's Collection</span>
               </label>
 
               <label className="flex items-center gap-2 p-2 border rounded-lg hover:bg-gray-50">
@@ -782,7 +776,7 @@ export default function EditProductPage() {
                   onChange={handleChange}
                   className="text-blue-600"
                 />
-                <span>Kids</span>
+                <span>Kids' Collection</span>
               </label>
             </div>
           </div>

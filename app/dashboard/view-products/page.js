@@ -17,7 +17,7 @@ export default function ViewProductsPage() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("/api/products", {
+        const res = await fetch("/api/products?getAll=true", {
           method: "GET",
           credentials: "include",
         });

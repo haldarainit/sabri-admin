@@ -6,11 +6,9 @@ import { uploadToCloudinary } from "@/lib/cloudinary";
 export async function GET(request, { params }) {
   try {
     await connectDB();
-
-    const { id } = params;
+    const { id } = await params;
 
     const product = await Product.findById(id);
-
     if (!product) {
       return NextResponse.json(
         {
@@ -40,21 +38,9 @@ export async function GET(request, { params }) {
 export async function PUT(request, { params }) {
   try {
     await connectDB();
-
     const { id } = params;
-    const formData = await request.formData();
 
-    // Check if product exists
-    const existingProduct = await Product.findById(id);
-    if (!existingProduct) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Product not found",
-        },
-        { status: 404 }
-      );
-    }
+    const formData = await request.formData();
 
     // Extract basic product fields
     const name = formData.get("name");
@@ -90,46 +76,52 @@ export async function PUT(request, { params }) {
     const women = formData.get("women") === "true";
     const kids = formData.get("kids") === "true";
 
-    // Handle image uploads
+    // Handle image uploads to Cloudinary (only if new images are provided)
     const imageFiles = formData.getAll("images");
-    const existingImagesStr = formData.get("existingImages");
-    let existingImages = [];
+    let images = [];
 
-    if (existingImagesStr) {
-      try {
-        existingImages = JSON.parse(existingImagesStr);
-      } catch (error) {
-        console.error("Error parsing existing images:", error);
-      }
-    }
-
-    let images = [...existingImages];
-
-    // Upload new images to Cloudinary
-    for (const file of imageFiles) {
-      if (file && file.size > 0) {
-        const uploadResult = await uploadToCloudinary(file, "sabri-jewelry");
-        if (uploadResult.success) {
-          images.push(uploadResult.data.url);
-        } else {
-          console.error(`Failed to upload image: ${uploadResult.error}`);
+    if (imageFiles && imageFiles.length > 0 && imageFiles[0].size > 0) {
+      // Upload new images to Cloudinary
+      for (const file of imageFiles) {
+        if (file && file.size > 0) {
+          const uploadResult = await uploadToCloudinary(file, "sabri-jewelry");
+          if (uploadResult.success) {
+            images.push(uploadResult.data.url);
+          } else {
+            console.error(`Failed to upload image: ${uploadResult.error}`);
+          }
         }
+      }
+    } else {
+      // Keep existing images
+      const existingProduct = await Product.findById(id);
+      if (existingProduct) {
+        images = existingProduct.images || [];
       }
     }
 
     // Validate required fields
-    if (!name || !price || !category || !stock || !description || !sku) {
+    if (
+      !name ||
+      !price ||
+      !originalPrice ||
+      !category ||
+      !stock ||
+      !description ||
+      !sku
+    ) {
       return NextResponse.json(
         {
           success: false,
-          message: "Missing required fields",
+          message:
+            "Missing required fields (name, price, originalPrice, category, stock, description, sku)",
         },
         { status: 400 }
       );
     }
 
-    // Update product data
-    const updateData = {
+    // Create product update object
+    const productData = {
       name,
       price,
       originalPrice,
@@ -164,15 +156,25 @@ export async function PUT(request, { params }) {
     };
 
     // Update the product
-    const updatedProduct = await Product.findByIdAndUpdate(id, updateData, {
+    const product = await Product.findByIdAndUpdate(id, productData, {
       new: true,
       runValidators: true,
     });
 
+    if (!product) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Product not found",
+        },
+        { status: 404 }
+      );
+    }
+
     return NextResponse.json({
       success: true,
       message: "Product updated successfully",
-      data: updatedProduct,
+      data: product,
     });
   } catch (error) {
     console.error("Update product error:", error);
@@ -190,11 +192,9 @@ export async function PUT(request, { params }) {
 export async function DELETE(request, { params }) {
   try {
     await connectDB();
-
     const { id } = params;
 
-    // Check if product exists
-    const product = await Product.findById(id);
+    const product = await Product.findByIdAndDelete(id);
     if (!product) {
       return NextResponse.json(
         {
@@ -204,9 +204,6 @@ export async function DELETE(request, { params }) {
         { status: 404 }
       );
     }
-
-    // Delete the product
-    await Product.findByIdAndDelete(id);
 
     return NextResponse.json({
       success: true,
