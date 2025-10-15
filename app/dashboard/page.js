@@ -102,7 +102,7 @@ export default function Dashboard() {
       }
 
       // Fetch products
-      const productsResponse = await fetch("/api/products", {
+      const productsResponse = await fetch("/api/products?getAll=true", {
         credentials: "include",
       });
       let products = [];

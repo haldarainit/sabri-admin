@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
-import Customer from "@/lib/models/Customer";
+import User from "@/lib/models/User";
 
 export async function GET(request) {
   try {
@@ -25,12 +25,12 @@ export async function GET(request) {
     }
 
     const [customers, total] = await Promise.all([
-      Customer.find(filter)
+      User.find(filter)
         .select("-password")
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit),
-      Customer.countDocuments(filter),
+      User.countDocuments(filter),
     ]);
 
     return NextResponse.json({
@@ -75,7 +75,7 @@ export async function DELETE(request) {
       );
     }
 
-    const customer = await Customer.findByIdAndDelete(customerId);
+    const customer = await User.findByIdAndDelete(customerId);
 
     if (!customer) {
       return NextResponse.json(

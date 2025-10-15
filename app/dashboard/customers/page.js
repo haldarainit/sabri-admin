@@ -12,7 +12,14 @@ export default function Customers() {
   const [sortOrder, setSortOrder] = useState("asc");
 
   // Delete customer function
-  const handleDeleteCustomer = async (customerId, customerName) => {
+  const handleDeleteCustomer = async (
+    customerId,
+    customerFirstName,
+    customerLastName
+  ) => {
+    const customerName = `${customerFirstName} ${
+      customerLastName || ""
+    }`.trim();
     console.log("🗑️ Delete clicked:", customerName, "ID:", customerId);
 
     const confirmed = window.confirm(
@@ -121,16 +128,24 @@ export default function Customers() {
 
   // Filter and search customers
   const filteredCustomers = customers.filter((customer) => {
+    const fullName = `${customer.firstName} ${customer.lastName || ""}`.trim();
     const matchesSearch =
-      customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.email.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesSearch;
   });
 
   // Sort customers
   const sortedCustomers = [...filteredCustomers].sort((a, b) => {
-    let aValue = a[sortBy];
-    let bValue = b[sortBy];
+    let aValue, bValue;
+
+    if (sortBy === "name") {
+      aValue = `${a.firstName} ${a.lastName || ""}`.trim();
+      bValue = `${b.firstName} ${b.lastName || ""}`.trim();
+    } else {
+      aValue = a[sortBy];
+      bValue = b[sortBy];
+    }
 
     aValue = String(aValue || "").toLowerCase();
     bValue = String(bValue || "").toLowerCase();
@@ -154,7 +169,8 @@ export default function Customers() {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   // Get customer initials for avatar
-  const getInitials = (name) => {
+  const getInitials = (firstName, lastName) => {
+    const name = `${firstName} ${lastName || ""}`.trim();
     return name
       .split(" ")
       .map((n) => n[0])
@@ -164,7 +180,8 @@ export default function Customers() {
   };
 
   // Generate avatar color based on name
-  const getAvatarColor = (name) => {
+  const getAvatarColor = (firstName, lastName) => {
+    const name = `${firstName} ${lastName || ""}`.trim();
     const colors = [
       "bg-blue-500",
       "bg-green-500",
@@ -387,17 +404,23 @@ export default function Customers() {
                             <div className="flex-shrink-0">
                               <div
                                 className={`h-12 w-12 rounded-full ${getAvatarColor(
-                                  customer.name
+                                  customer.firstName,
+                                  customer.lastName
                                 )} flex items-center justify-center shadow-sm border border-white/20`}
                               >
                                 <span className="text-white font-semibold text-sm">
-                                  {getInitials(customer.name)}
+                                  {getInitials(
+                                    customer.firstName,
+                                    customer.lastName
+                                  )}
                                 </span>
                               </div>
                             </div>
                             <div className="ml-4">
                               <div className="text-sm font-semibold text-gray-200">
-                                {customer.name}
+                                {`${customer.firstName} ${
+                                  customer.lastName || ""
+                                }`.trim()}
                               </div>
                               <div className="text-sm text-gray-400">
                                 Customer ID: {customer._id.slice(-6)}
@@ -428,7 +451,8 @@ export default function Customers() {
                               onClick={() =>
                                 handleDeleteCustomer(
                                   customer._id,
-                                  customer.name
+                                  customer.firstName,
+                                  customer.lastName
                                 )
                               }
                               className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center gap-1"
