@@ -151,7 +151,19 @@ export default function Dashboard() {
       const topCustomers = Object.entries(customerOrderCounts)
         .map(([email, count]) => {
           const customer = customers.find((c) => c.email === email);
-          return customer ? { ...customer, orderCount: count } : null;
+          if (customer) {
+            // Create a customer object with proper name field
+            const customerName =
+              customer.fullName ||
+              `${customer.firstName || ""} ${customer.lastName || ""}`.trim() ||
+              "Unknown Customer";
+            return {
+              ...customer,
+              name: customerName,
+              orderCount: count,
+            };
+          }
+          return null;
         })
         .filter(Boolean)
         .sort((a, b) => b.orderCount - a.orderCount)
@@ -960,12 +972,14 @@ export default function Dashboard() {
                   </div>
                   <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
                     <span className="text-blue-600 text-sm font-semibold">
-                      {customer.name.charAt(0)}
+                      {(customer.name || customer.email || "U")
+                        .charAt(0)
+                        .toUpperCase()}
                     </span>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-100">
-                      {customer.name}
+                      {customer.name || customer.email || "Unknown Customer"}
                     </p>
                     <p className="text-xs text-gray-400">{customer.email}</p>
                   </div>

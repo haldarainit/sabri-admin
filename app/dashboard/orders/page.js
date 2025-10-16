@@ -80,7 +80,7 @@ export default function OrdersPage() {
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
       setUpdateStatusLoading(true);
-      const response = await fetch(`/api/admin/orders/${orderId}/status`, {
+      const response = await fetch(`/api/admin/orders/${orderId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -134,36 +134,61 @@ export default function OrdersPage() {
   // Download invoice
   const downloadInvoice = async (orderId) => {
     try {
-      const response = await fetch(`/api/admin/orders/${orderId}/invoice`, {
-        method: "GET",
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to generate invoice: ${response.status}`);
+      // For now, we'll generate a simple text invoice
+      const order = orders.find((o) => o.orderId === orderId);
+      if (!order) {
+        alert("Order not found");
+        return;
       }
 
-      // Get the filename from the Content-Disposition header or use a default
-      const contentDisposition = response.headers.get("Content-Disposition");
-      let filename = "invoice.pdf";
-      if (contentDisposition) {
-        const filenameMatch = contentDisposition.match(/filename="(.+)"/);
-        if (filenameMatch) {
-          filename = filenameMatch[1];
-        }
-      }
+      const invoiceContent = `
+INVOICE
+Order ID: ${order.orderId}
+Date: ${new Date(order.createdAt).toLocaleDateString()}
 
-      // Convert response to blob and download
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
+Shipping Address:
+${order.shippingAddress.name}
+${order.shippingAddress.addressLine1}
+${order.shippingAddress.addressLine2 || ""}
+${order.shippingAddress.city}, ${order.shippingAddress.state} - ${
+        order.shippingAddress.zipCode
+      }
+Phone: ${order.shippingAddress.phone}
+
+Items:
+${order.items
+  .map(
+    (item) => `${item.name} x${item.quantity} - ₹${item.price * item.quantity}`
+  )
+  .join("\n")}
+
+Order Summary:
+Subtotal: ₹${order.orderSummary.subtotal}
+${
+  order.orderSummary.couponDiscount > 0
+    ? `Coupon Discount (${order.orderSummary.couponCode}): -₹${order.orderSummary.couponDiscount}`
+    : ""
+}
+Tax: ₹${order.orderSummary.tax}
+Shipping: ₹${order.orderSummary.shippingCharge}
+Total: ₹${order.orderSummary.total}
+
+Payment Method: ${
+        order.paymentMethod === "cash_on_delivery"
+          ? "Cash on Delivery"
+          : "Online Payment"
+      }
+      `.trim();
+
+      const blob = new Blob([invoiceContent], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
-      a.style.display = "none";
       a.href = url;
-      a.download = filename;
+      a.download = `invoice-${order.orderId}.txt`;
       document.body.appendChild(a);
       a.click();
-      window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
+      URL.revokeObjectURL(url);
 
       console.log("Invoice downloaded successfully");
     } catch (error) {
@@ -220,7 +245,7 @@ export default function OrdersPage() {
             </div>
             <div className="flex items-center gap-3">
               <button
-                onClick={() => downloadInvoice(order._id)}
+                onClick={() => downloadInvoice(order.orderId)}
                 className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 transform hover:scale-105 shadow-lg"
                 title="Download Invoice"
               >
@@ -606,7 +631,7 @@ export default function OrdersPage() {
                           <Eye className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => downloadInvoice(order._id)}
+                          onClick={() => downloadInvoice(order.orderId)}
                           className="text-green-400 hover:text-green-300 transition-all duration-300 p-1 rounded hover:bg-green-500/20"
                           title="Download Invoice"
                         >
