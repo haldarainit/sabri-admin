@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { downloadInvoicePDF } from "@/utils/invoiceUtils";
 import {
   Package,
   Search,
@@ -131,70 +132,15 @@ export default function OrdersPage() {
     }
   };
 
-  // Download invoice
+  // Download invoice as PDF using shared utility
   const downloadInvoice = async (orderId) => {
-    try {
-      // For now, we'll generate a simple text invoice
-      const order = orders.find((o) => o.orderId === orderId);
-      if (!order) {
-        alert("Order not found");
-        return;
-      }
-
-      const invoiceContent = `
-INVOICE
-Order ID: ${order.orderId}
-Date: ${new Date(order.createdAt).toLocaleDateString()}
-
-Shipping Address:
-${order.shippingAddress.name}
-${order.shippingAddress.addressLine1}
-${order.shippingAddress.addressLine2 || ""}
-${order.shippingAddress.city}, ${order.shippingAddress.state} - ${
-        order.shippingAddress.zipCode
-      }
-Phone: ${order.shippingAddress.phone}
-
-Items:
-${order.items
-  .map(
-    (item) => `${item.name} x${item.quantity} - ₹${item.price * item.quantity}`
-  )
-  .join("\n")}
-
-Order Summary:
-Subtotal: ₹${order.orderSummary.subtotal}
-${
-  order.orderSummary.couponDiscount > 0
-    ? `Coupon Discount (${order.orderSummary.couponCode}): -₹${order.orderSummary.couponDiscount}`
-    : ""
-}
-Tax: ₹${order.orderSummary.tax}
-Shipping: ₹${order.orderSummary.shippingCharge}
-Total: ₹${order.orderSummary.total}
-
-Payment Method: ${
-        order.paymentMethod === "cash_on_delivery"
-          ? "Cash on Delivery"
-          : "Online Payment"
-      }
-      `.trim();
-
-      const blob = new Blob([invoiceContent], { type: "text/plain" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `invoice-${order.orderId}.txt`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
-      console.log("Invoice downloaded successfully");
-    } catch (error) {
-      console.error("Error downloading invoice:", error);
-      alert(`Failed to download invoice: ${error.message}`);
+    const order = orders.find((o) => o.orderId === orderId);
+    if (!order) {
+      alert("Order not found");
+      return;
     }
+    const ok = await downloadInvoicePDF(order);
+    if (!ok) alert("Failed to download invoice PDF");
   };
 
   // Status badge component
