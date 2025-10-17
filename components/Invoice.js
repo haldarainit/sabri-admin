@@ -213,18 +213,6 @@ const Invoice = forwardRef(({ orderData }, ref) => {
           </ul>
         </div>
       </div>
-
-      {/* Signature */}
-      <div style={styles.signature}>
-        <div style={styles.signatureLeft}>
-          <p style={styles.signatureLabel}>Customer Signature</p>
-          <div style={styles.signatureLine}></div>
-        </div>
-        <div style={styles.signatureRight}>
-          <p style={styles.signatureLabel}>Authorized Signature</p>
-          <div style={styles.signatureLine}></div>
-        </div>
-      </div>
     </div>
   );
 });
