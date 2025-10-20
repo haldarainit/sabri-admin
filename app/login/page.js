@@ -31,6 +31,9 @@ export default function LoginPage() {
       if (res.ok) {
         // ✅ Redirect to dashboard after successful login
         router.push("/dashboard");
+      } else if (res.status === 429) {
+        // Handle rate limiting
+        setError("Too many login attempts. Please wait a few minutes before trying again.");
       } else {
         // ❌ Show backend error message
         setError(data.message || "Login failed");
@@ -38,7 +41,11 @@ export default function LoginPage() {
     } catch (err) {
       // 🔹 Network or unexpected errors
       console.error(err);
-      setError("Something went wrong. Please try again.");
+      if (err.name === 'TypeError' && err.message.includes('Failed to fetch')) {
+        setError("Network error. Please check your connection and try again.");
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }

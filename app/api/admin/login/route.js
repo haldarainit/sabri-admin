@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import connectDB from "@/lib/db";
 import Admin from "@/lib/models/Admin";
+import { loginRateLimit } from "@/lib/middleware/rateLimit";
 
 // Generate JWT Token
 const generateToken = (id) => {
@@ -11,6 +12,12 @@ const generateToken = (id) => {
 };
 
 export async function POST(request) {
+  // Apply rate limiting
+  const rateLimitResponse = loginRateLimit(request);
+  if (rateLimitResponse) {
+    return rateLimitResponse;
+  }
+
   try {
     await connectDB();
 
