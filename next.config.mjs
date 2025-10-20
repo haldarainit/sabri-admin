@@ -1,10 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Optimize static assets
-  experimental: {
-    // remove optimizeCss to avoid critters requirement during prerender
-    optimizePackageImports: ['lucide-react', 'framer-motion'],
-  },
   
   // Configure headers for better caching
   async headers() {
