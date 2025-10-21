@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Order from "@/lib/models/Order";
+import User from "@/lib/models/User";
 
 export async function PUT(request, { params }) {
   try {
@@ -13,7 +14,9 @@ export async function PUT(request, { params }) {
       { orderId: id },
       { status },
       { new: true }
-    ).populate("user", "name email");
+    )
+      .populate("user", "firstName lastName email")
+      .lean();
 
     if (!order) {
       return NextResponse.json(
@@ -32,10 +35,13 @@ export async function PUT(request, { params }) {
     });
   } catch (error) {
     console.error("Update order status error:", error);
+    console.error("Error stack:", error.stack);
     return NextResponse.json(
       {
         success: false,
         message: "Server error updating order status",
+        error:
+          process.env.NODE_ENV === "development" ? error.message : undefined,
       },
       { status: 500 }
     );
@@ -66,10 +72,13 @@ export async function DELETE(request, { params }) {
     });
   } catch (error) {
     console.error("Delete order error:", error);
+    console.error("Error stack:", error.stack);
     return NextResponse.json(
       {
         success: false,
         message: "Server error deleting order",
+        error:
+          process.env.NODE_ENV === "development" ? error.message : undefined,
       },
       { status: 500 }
     );

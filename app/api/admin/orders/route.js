@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Order from "@/lib/models/Order";
+import User from "@/lib/models/User";
 
 export async function GET(request) {
   try {
@@ -27,10 +28,11 @@ export async function GET(request) {
 
     const [orders, total] = await Promise.all([
       Order.find(filter)
-        .populate("user", "name email")
+        .populate("user", "firstName lastName email")
         .sort({ createdAt: -1 })
         .skip(skip)
-        .limit(limit),
+        .limit(limit)
+        .lean(),
       Order.countDocuments(filter),
     ]);
 
@@ -61,10 +63,13 @@ export async function GET(request) {
     });
   } catch (error) {
     console.error("Get orders error:", error);
+    console.error("Error stack:", error.stack);
     return NextResponse.json(
       {
         success: false,
         message: "Server error getting orders",
+        error:
+          process.env.NODE_ENV === "development" ? error.message : undefined,
       },
       { status: 500 }
     );
@@ -93,7 +98,9 @@ export async function PUT(request) {
       { orderId },
       { status },
       { new: true }
-    ).populate("user", "name email");
+    )
+      .populate("user", "firstName lastName email")
+      .lean();
 
     if (!order) {
       return NextResponse.json(
@@ -112,10 +119,13 @@ export async function PUT(request) {
     });
   } catch (error) {
     console.error("Update order status error:", error);
+    console.error("Error stack:", error.stack);
     return NextResponse.json(
       {
         success: false,
         message: "Server error updating order status",
+        error:
+          process.env.NODE_ENV === "development" ? error.message : undefined,
       },
       { status: 500 }
     );
@@ -157,10 +167,13 @@ export async function DELETE(request) {
     });
   } catch (error) {
     console.error("Delete order error:", error);
+    console.error("Error stack:", error.stack);
     return NextResponse.json(
       {
         success: false,
         message: "Server error deleting order",
+        error:
+          process.env.NODE_ENV === "development" ? error.message : undefined,
       },
       { status: 500 }
     );
