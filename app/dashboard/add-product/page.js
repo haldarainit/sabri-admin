@@ -7,6 +7,7 @@ export default function AddProductPage() {
     name: "",
     price: 0,
     originalPrice: 0,
+    cost: 0,
     category: "",
     subcategory: "",
     stock: 0,
@@ -28,6 +29,7 @@ export default function AddProductPage() {
     isGiftable: true,
     isOnSale: false,
     discount: 0,
+    ringCumBangles: false,
     // Target audience
     men: false,
     women: false,
@@ -121,6 +123,7 @@ export default function AddProductPage() {
     formData.append("name", form.name);
     formData.append("price", form.price);
     formData.append("originalPrice", form.originalPrice || "");
+    formData.append("cost", form.cost || 0);
     formData.append("discount", form.discount || 0);
     formData.append("category", form.category);
     formData.append("subcategory", form.subcategory || "");
@@ -149,6 +152,7 @@ export default function AddProductPage() {
     formData.append("isFeatured", form.isFeatured);
     formData.append("isGiftable", form.isGiftable);
     formData.append("isOnSale", form.isOnSale);
+    formData.append("ringCumBangles", form.ringCumBangles);
     formData.append("men", form.men);
     formData.append("women", form.women);
     formData.append("kids", form.kids);
@@ -179,6 +183,7 @@ export default function AddProductPage() {
         name: "",
         price: 0,
         originalPrice: 0,
+        cost: 0,
         category: "",
         subcategory: "",
         stock: 0,
@@ -198,6 +203,7 @@ export default function AddProductPage() {
         isGiftable: true,
         isOnSale: false,
         discount: 0,
+        ringCumBangles: false,
         men: false,
         women: false,
         kids: false,
@@ -1173,6 +1179,7 @@ export default function AddProductPage() {
               <option value="earrings">Earrings</option>
               <option value="rings">Rings</option>
               <option value="bracelets">Bracelets</option>
+              <option value="ring-cum-bangles">Ring-cum-Bangles</option>
               <option value="fine-gold">Fine Gold</option>
               <option value="fine-silver">Fine Silver</option>
               <option value="mens">Men's Collection</option>
@@ -1501,17 +1508,17 @@ export default function AddProductPage() {
             <h3 className="text-lg font-semibold text-white mb-4">
               Pricing Information
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Original Price */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Cost Price */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Compare-At-Price *
+                  Cost Price *
                 </label>
                 <input
                   type="number"
-                  name="originalPrice"
-                  placeholder="e.g., 5999"
-                  value={form.originalPrice}
+                  name="cost"
+                  placeholder="e.g., 2500"
+                  value={form.cost}
                   onChange={handleChange}
                   className="w-full p-3 border border-gray-600 rounded-lg bg-gray-700 text-white"
                   min="0"
@@ -1519,14 +1526,14 @@ export default function AddProductPage() {
                   required
                 />
                 <p className="text-xs text-gray-400 mt-1">
-                  The original cost price of the product
+                  The actual cost of the product
                 </p>
               </div>
 
-              {/* Our Price */}
+              {/* Selling Price */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Our Selling Price *
+                  Selling Price *
                 </label>
                 <input
                   type="number"
@@ -1543,10 +1550,31 @@ export default function AddProductPage() {
                   The price we sell to customers
                 </p>
               </div>
+
+              {/* Original/Compare-at Price */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Compare-At-Price *
+                </label>
+                <input
+                  type="number"
+                  name="originalPrice"
+                  placeholder="e.g., 5999"
+                  value={form.originalPrice}
+                  onChange={handleChange}
+                  className="w-full p-3 border border-gray-600 rounded-lg bg-gray-700 text-white"
+                  min="0"
+                  step="0.01"
+                  required
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  The original MRP for display
+                </p>
+              </div>
             </div>
 
             {/* Margin Calculation */}
-            {form.originalPrice > 0 && form.price > 0 && (
+            {form.cost > 0 && form.price > 0 && (
               <div className="mt-4 p-4 bg-gray-700/50 rounded-lg border border-gray-600">
                 <h4 className="text-sm font-medium text-gray-300 mb-2">
                   Profit Margin Calculation
@@ -1555,31 +1583,46 @@ export default function AddProductPage() {
                   <div>
                     <span className="text-gray-400">Gross Profit:</span>
                     <span className="text-green-400 font-medium ml-2">
-                      ₹{(form.price - form.originalPrice).toFixed(2)}
+                      ₹{(form.price - form.cost).toFixed(2)}
                     </span>
                   </div>
                   <div>
                     <span className="text-gray-400">Profit Margin:</span>
                     <span className="text-green-400 font-medium ml-2">
-                      {(
-                        ((form.price - form.originalPrice) /
-                          form.originalPrice) *
-                        100
-                      ).toFixed(1)}
+                      {(((form.price - form.cost) / form.cost) * 100).toFixed(
+                        1
+                      )}
                       %
                     </span>
                   </div>
                   <div>
-                    <span className="text-gray-400">Markup:</span>
+                    <span className="text-gray-400">
+                      Markup on Selling Price:
+                    </span>
                     <span className="text-blue-400 font-medium ml-2">
-                      {(
-                        ((form.price - form.originalPrice) / form.price) *
-                        100
-                      ).toFixed(1)}
+                      {(((form.price - form.cost) / form.price) * 100).toFixed(
+                        1
+                      )}
                       %
                     </span>
                   </div>
                 </div>
+                {form.originalPrice > 0 && (
+                  <div className="mt-3 pt-3 border-t border-gray-600">
+                    <span className="text-gray-400 text-sm">
+                      Customer Savings:
+                    </span>
+                    <span className="text-yellow-400 font-medium ml-2">
+                      ₹{(form.originalPrice - form.price).toFixed(2)} (
+                      {(
+                        ((form.originalPrice - form.price) /
+                          form.originalPrice) *
+                        100
+                      ).toFixed(1)}
+                      % off)
+                    </span>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -1643,6 +1686,17 @@ export default function AddProductPage() {
                   className="text-blue-500"
                 />
                 <span>On Sale</span>
+              </label>
+
+              <label className="flex items-center gap-2 p-2 border border-gray-600 rounded-lg hover:bg-gray-700 text-white">
+                <input
+                  type="checkbox"
+                  name="ringCumBangles"
+                  checked={form.ringCumBangles}
+                  onChange={handleChange}
+                  className="text-blue-500"
+                />
+                <span>Ring-cum-Bangles</span>
               </label>
 
               <label className="flex items-center gap-2 p-2 border border-gray-600 rounded-lg hover:bg-gray-700 text-white">

@@ -69,6 +69,7 @@ export async function POST(request) {
     const name = formData.get("name");
     const price = parseFloat(formData.get("price"));
     const originalPrice = parseFloat(formData.get("originalPrice")) || 0;
+    const cost = parseFloat(formData.get("cost")) || 0;
     const discount = parseFloat(formData.get("discount")) || 0;
     const category = formData.get("category");
     const subcategory = formData.get("subcategory") || "";
@@ -95,6 +96,7 @@ export async function POST(request) {
     const isFeatured = formData.get("isFeatured") === "true";
     const isGiftable = formData.get("isGiftable") === "true";
     const isOnSale = formData.get("isOnSale") === "true";
+    const ringCumBangles = formData.get("ringCumBangles") === "true";
     const men = formData.get("men") === "true";
     const women = formData.get("women") === "true";
     const kids = formData.get("kids") === "true";
@@ -160,6 +162,7 @@ export async function POST(request) {
       name,
       price,
       originalPrice,
+      cost,
       discount,
       category,
       subcategory,
@@ -174,6 +177,7 @@ export async function POST(request) {
       isFeatured,
       isGiftable,
       isOnSale,
+      ringCumBangles,
       men,
       women,
       kids,
@@ -184,6 +188,7 @@ export async function POST(request) {
         ...(isFeatured ? ["featured"] : []),
         ...(isGiftable ? ["giftable"] : []),
         ...(isOnSale ? ["on-sale"] : []),
+        ...(ringCumBangles ? ["ring-cum-bangles"] : []),
         ...(men ? ["men"] : []),
         ...(women ? ["women"] : []),
         ...(kids ? ["kids"] : []),

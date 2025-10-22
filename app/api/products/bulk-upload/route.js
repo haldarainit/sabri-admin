@@ -72,6 +72,7 @@ export async function POST(request) {
               "name",
               "price",
               "originalPrice",
+              "cost",
               "category",
               "stock",
               "description",
@@ -101,6 +102,7 @@ export async function POST(request) {
             const originalPrice = parseFloat(
               row.originalPrice || row.originalprice
             );
+            const cost = parseFloat(row.cost) || 0;
             const discount = parseFloat(row.discount) || 0;
             const stock = parseInt(row.stock);
 
@@ -163,6 +165,7 @@ export async function POST(request) {
               name: row.name,
               price: price,
               originalPrice: originalPrice,
+              cost: cost,
               discount: discount,
               category: row.category,
               subcategory: row.subcategory || "",
@@ -178,6 +181,9 @@ export async function POST(request) {
               isFeatured: parseBoolean(row.isFeatured || row.isfeatured),
               isGiftable: parseBoolean(row.isGiftable || row.isgiftable),
               isOnSale: parseBoolean(row.isOnSale || row.isonsale),
+              ringCumBangles: parseBoolean(
+                row.ringCumBangles || row.ringcumbangles
+              ),
               men: parseBoolean(row.men),
               women: parseBoolean(row.women),
               kids: parseBoolean(row.kids),
@@ -197,6 +203,9 @@ export async function POST(request) {
                   : []),
                 ...(parseBoolean(row.isOnSale || row.isonsale)
                   ? ["on-sale"]
+                  : []),
+                ...(parseBoolean(row.ringCumBangles || row.ringcumbangles)
+                  ? ["ring-cum-bangles"]
                   : []),
                 ...(parseBoolean(row.men) ? ["men"] : []),
                 ...(parseBoolean(row.women) ? ["women"] : []),
