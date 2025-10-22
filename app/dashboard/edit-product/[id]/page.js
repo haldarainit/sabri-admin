@@ -12,6 +12,7 @@ export default function EditProductPage() {
     name: "",
     price: 0,
     originalPrice: 0,
+    cost: 0,
     discount: 0,
     category: "",
     subcategory: "",
@@ -33,6 +34,7 @@ export default function EditProductPage() {
     isFeatured: false,
     isGiftable: true,
     isOnSale: false,
+    ringCumBangles: false,
     // Target audience
     men: false,
     women: false,
@@ -62,6 +64,7 @@ export default function EditProductPage() {
         name: product.name || "",
         price: product.price || 0,
         originalPrice: product.originalPrice || 0,
+        cost: product.cost || 0, // Default to 0 if not set
         discount: product.discount || 0,
         category: product.category || "",
         subcategory: product.subcategory || "",
@@ -83,6 +86,7 @@ export default function EditProductPage() {
         isGiftable:
           product.isGiftable !== undefined ? product.isGiftable : true,
         isOnSale: product.isOnSale || false,
+        ringCumBangles: product.ringCumBangles || false,
         men: product.men || false,
         women: product.women !== undefined ? product.women : false,
         kids: product.kids || false,
@@ -260,6 +264,7 @@ export default function EditProductPage() {
     formData.append("name", form.name);
     formData.append("price", form.price);
     formData.append("originalPrice", form.originalPrice || "");
+    formData.append("cost", form.cost || 0);
     formData.append("discount", form.discount || 0);
     formData.append("category", form.category);
     formData.append("subcategory", form.subcategory || "");
@@ -288,6 +293,7 @@ export default function EditProductPage() {
     formData.append("isFeatured", form.isFeatured);
     formData.append("isGiftable", form.isGiftable);
     formData.append("isOnSale", form.isOnSale);
+    formData.append("ringCumBangles", form.ringCumBangles);
     formData.append("men", form.men);
     formData.append("women", form.women);
     formData.append("kids", form.kids);
@@ -374,10 +380,26 @@ export default function EditProductPage() {
           </div>
 
           {/* Price and Original Price */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Current Price *
+                Cost Price *
+              </label>
+              <input
+                type="number"
+                name="cost"
+                placeholder="e.g., 100"
+                value={form.cost}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-300 rounded-lg"
+                min="0"
+                step="0.01"
+              />
+              <p className="text-xs text-gray-500 mt-1">Actual cost</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Selling Price *
               </label>
               <input
                 type="number"
@@ -395,10 +417,11 @@ export default function EditProductPage() {
               {errors.price && (
                 <p className="text-red-500 text-sm mt-1">{errors.price}</p>
               )}
+              <p className="text-xs text-gray-500 mt-1">Customer price</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Original Price *
+                Compare-At Price *
               </label>
               <input
                 type="number"
@@ -418,8 +441,39 @@ export default function EditProductPage() {
                   {errors.originalPrice}
                 </p>
               )}
+              <p className="text-xs text-gray-500 mt-1">Original MRP</p>
             </div>
           </div>
+
+          {/* Profit Calculation Display */}
+          {form.cost > 0 && form.price > 0 && (
+            <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+              <h4 className="text-sm font-medium text-gray-700 mb-2">
+                Profit Calculation
+              </h4>
+              <div className="grid grid-cols-3 gap-4 text-sm">
+                <div>
+                  <span className="text-gray-600">Gross Profit:</span>
+                  <span className="text-green-600 font-semibold ml-2">
+                    ₹{(form.price - form.cost).toFixed(2)}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-gray-600">Profit Margin:</span>
+                  <span className="text-green-600 font-semibold ml-2">
+                    {(((form.price - form.cost) / form.cost) * 100).toFixed(1)}%
+                  </span>
+                </div>
+                <div>
+                  <span className="text-gray-600">Markup:</span>
+                  <span className="text-blue-600 font-semibold ml-2">
+                    {(((form.price - form.cost) / form.price) * 100).toFixed(1)}
+                    %
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Discount */}
           <div>
@@ -873,6 +927,17 @@ export default function EditProductPage() {
                   className="text-blue-600"
                 />
                 <span>On Sale</span>
+              </label>
+
+              <label className="flex items-center gap-2 p-2 border rounded-lg hover:bg-gray-50">
+                <input
+                  type="checkbox"
+                  name="ringCumBangles"
+                  checked={form.ringCumBangles}
+                  onChange={handleChange}
+                  className="text-blue-600"
+                />
+                <span>Ring-cum-Bangles</span>
               </label>
 
               <label className="flex items-center gap-2 p-2 border rounded-lg hover:bg-gray-50">
