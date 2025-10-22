@@ -38,8 +38,39 @@ export async function GET(request, { params }) {
 export async function PUT(request, { params }) {
   try {
     await connectDB();
-    const { id } = params;
+    const { id } = await params;
 
+    // Check content type to determine how to parse the request
+    const contentType = request.headers.get("content-type");
+
+    // If it's a simple JSON update (like stock update from view products page)
+    if (contentType && contentType.includes("application/json")) {
+      const body = await request.json();
+
+      // Update the product with the provided fields
+      const product = await Product.findByIdAndUpdate(id, body, {
+        new: true,
+        runValidators: true,
+      });
+
+      if (!product) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Product not found",
+          },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: "Product updated successfully",
+        data: product,
+      });
+    }
+
+    // Otherwise, handle as FormData (full product update with images)
     const formData = await request.formData();
 
     // Extract basic product fields
@@ -207,7 +238,7 @@ export async function PUT(request, { params }) {
 export async function DELETE(request, { params }) {
   try {
     await connectDB();
-    const { id } = params;
+    const { id } = await params;
 
     const product = await Product.findByIdAndDelete(id);
     if (!product) {

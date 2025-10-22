@@ -448,7 +448,13 @@ export default function ViewProductsPage() {
                         Category
                       </th>
                       <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider border-b border-white/10">
+                        Cost
+                      </th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider border-b border-white/10">
                         Price
+                      </th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider border-b border-white/10">
+                        Profit
                       </th>
                       <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider border-b border-white/10">
                         Stock
@@ -513,8 +519,39 @@ export default function ViewProductsPage() {
                             {product.category}
                           </span>
                         </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-200">
+                          {product.cost && product.cost > 0 ? (
+                            <span className="font-medium">
+                              ₹{product.cost?.toLocaleString()}
+                            </span>
+                          ) : (
+                            <span className="text-gray-400 italic">N/A</span>
+                          )}
+                        </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-200">
                           ₹{product.price?.toLocaleString()}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-200">
+                          {product.cost && product.cost > 0 && product.price ? (
+                            <div className="flex flex-col">
+                              <span className="font-medium text-green-400">
+                                ₹
+                                {(
+                                  product.price - product.cost
+                                )?.toLocaleString()}
+                              </span>
+                              <span className="text-xs text-gray-400">
+                                {(
+                                  ((product.price - product.cost) /
+                                    product.cost) *
+                                  100
+                                ).toFixed(1)}
+                                %
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="text-gray-400 italic">N/A</span>
+                          )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-200">
                           <div className="flex items-center">
