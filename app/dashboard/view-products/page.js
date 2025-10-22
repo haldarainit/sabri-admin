@@ -243,12 +243,64 @@ export default function ViewProductsPage() {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="bg-white/10 backdrop-blur-lg px-4 py-2 rounded-lg border border-white/20">
-                <span className="text-sm font-medium text-white">
-                  Total Products: {products.length}
+            <div className="flex items-center gap-3 flex-wrap">
+              {/* Total SKUs */}
+              <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 backdrop-blur-lg px-5 py-3 rounded-lg border border-blue-400/30 shadow-lg">
+                <span className="text-xs text-blue-200 block mb-1 font-medium">
+                  Total SKUs
+                </span>
+                <span className="text-2xl font-bold text-white">
+                  {products.length}
                 </span>
               </div>
+
+              {/* Total Products (Units) */}
+              <div className="bg-gradient-to-br from-purple-500/20 to-purple-600/20 backdrop-blur-lg px-5 py-3 rounded-lg border border-purple-400/30 shadow-lg">
+                <span className="text-xs text-purple-200 block mb-1 font-medium">
+                  Total Units
+                </span>
+                <span className="text-2xl font-bold text-white">
+                  {products
+                    .reduce((sum, product) => sum + (product.stock || 0), 0)
+                    .toLocaleString()}
+                </span>
+              </div>
+
+              {/* Total Cost */}
+              <div className="bg-gradient-to-br from-orange-500/20 to-orange-600/20 backdrop-blur-lg px-5 py-3 rounded-lg border border-orange-400/30 shadow-lg">
+                <span className="text-xs text-orange-200 block mb-1 font-medium">
+                  Total Cost
+                </span>
+                <span className="text-2xl font-bold text-orange-300">
+                  ₹
+                  {products
+                    .reduce(
+                      (sum, product) =>
+                        sum + (product.cost || 0) * (product.stock || 0),
+                      0
+                    )
+                    .toLocaleString()}
+                </span>
+              </div>
+
+              {/* Total Profit */}
+              <div className="bg-gradient-to-br from-green-500/20 to-green-600/20 backdrop-blur-lg px-5 py-3 rounded-lg border border-green-400/30 shadow-lg">
+                <span className="text-xs text-green-200 block mb-1 font-medium">
+                  Total Profit
+                </span>
+                <span className="text-2xl font-bold text-green-300">
+                  ₹
+                  {products
+                    .reduce((sum, product) => {
+                      const profit =
+                        ((product.price || 0) - (product.cost || 0)) *
+                        (product.stock || 0);
+                      return sum + profit;
+                    }, 0)
+                    .toLocaleString()}
+                </span>
+              </div>
+
               <button
                 onClick={() => router.push("/dashboard/add-product")}
                 className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-2.5 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center gap-2"
