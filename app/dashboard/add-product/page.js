@@ -1505,7 +1505,7 @@ export default function AddProductPage() {
               {/* Original Price */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Original Price *
+                  Compare-At-Price *
                 </label>
                 <input
                   type="number"
