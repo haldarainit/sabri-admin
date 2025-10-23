@@ -274,12 +274,16 @@ export default function ViewProductsPage() {
                 <span className="text-2xl font-bold text-orange-300">
                   ₹
                   {products
-                    .reduce(
-                      (sum, product) =>
-                        sum + (product.cost || 0) * (product.stock || 0),
-                      0
-                    )
+                    .reduce((sum, product) => {
+                      const cost = parseFloat(product.cost) || 0;
+                      const stock = parseInt(product.stock) || 0;
+                      return sum + cost * stock;
+                    }, 0)
                     .toLocaleString()}
+                </span>
+                <span className="text-xs text-orange-200 block mt-1">
+                  {products.filter((p) => (parseFloat(p.cost) || 0) > 0).length}{" "}
+                  products with cost data
                 </span>
               </div>
 
