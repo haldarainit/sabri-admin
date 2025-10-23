@@ -320,6 +320,89 @@ export default function ViewProductsPage() {
                 </svg>
                 Add Product
               </button>
+
+              {/* CSV Export */}
+              <button
+                onClick={async () => {
+                  try {
+                    // Generate CSV from products array
+                    if (!products || !products.length) {
+                      alert("No products to export");
+                      return;
+                    }
+                    const headers = [
+                      "_id",
+                      "name",
+                      "sku",
+                      "category",
+                      "price",
+                      "cost",
+                      "stock",
+                      "brand",
+                      "isActive",
+                      "isFeatured",
+                      "tags",
+                    ];
+
+                    const rows = products.map((p) => [
+                      p._id || "",
+                      p.name || "",
+                      p.sku || "",
+                      p.category || "",
+                      p.price || "",
+                      p.cost || "",
+                      p.stock || 0,
+                      p.brand || "",
+                      p.isActive ? "true" : "false",
+                      p.isFeatured ? "true" : "false",
+                      Array.isArray(p.tags) ? p.tags.join("|") : p.tags || "",
+                    ]);
+
+                    const csvContent = [headers, ...rows]
+                      .map((r) =>
+                        r
+                          .map((cell) => {
+                            if (cell === null || cell === undefined) return "";
+                            const cellStr = String(cell).replace(/"/g, '""');
+                            return `"${cellStr}"`;
+                          })
+                          .join(",")
+                      )
+                      .join("\n");
+
+                    const blob = new Blob([csvContent], { type: "text/csv" });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = `products_export_${new Date()
+                      .toISOString()
+                      .slice(0, 10)}.csv`;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    URL.revokeObjectURL(url);
+                  } catch (e) {
+                    console.error("Error exporting CSV:", e);
+                    alert("Failed to export CSV. See console for details.");
+                  }
+                }}
+                className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-6 py-2.5 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center gap-2"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+                Export CSV
+              </button>
             </div>
           </div>
         </div>
