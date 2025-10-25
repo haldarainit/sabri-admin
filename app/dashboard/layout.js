@@ -1,11 +1,10 @@
 "use client";
 
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function DashboardLayout({ children }) {
   const router = useRouter();
-  const pathname = usePathname();
   const [loading, setLoading] = useState(true);
   const [admin, setAdmin] = useState(null);
   const [sidebarVisible, setSidebarVisible] = useState(false);
@@ -235,21 +234,11 @@ export default function DashboardLayout({ children }) {
                     router.push("/dashboard/demographics");
                     if (window.innerWidth < 1024) setSidebarVisible(false);
                   }}
-                  className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-300 flex items-center gap-3 group ${
-                    pathname?.startsWith("/dashboard/demographics")
-                      ? "bg-teal-700 text-white"
-                      : "hover:bg-gray-700 text-gray-300"
-                  }`}
+                  className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-700 transition-all duration-300 text-gray-300 flex items-center gap-3 group"
                 >
-                  <div
-                    className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 ${
-                      pathname?.startsWith("/dashboard/demographics")
-                        ? "bg-teal-600 text-white"
-                        : "bg-gray-700 text-gray-400 group-hover:bg-teal-600 group-hover:text-white"
-                    }`}
-                  >
+                  <div className="w-8 h-8 bg-gray-700 rounded-lg flex items-center justify-center group-hover:bg-teal-600 group-hover:text-white transition-all duration-300">
                     <svg
-                      className="w-4 h-4"
+                      className="w-4 h-4 text-gray-400 group-hover:text-white"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -269,9 +258,6 @@ export default function DashboardLayout({ children }) {
                     </svg>
                   </div>
                   <span className="font-medium">Demographics</span>
-                  <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-teal-600/20 text-teal-300 border border-teal-600/30">
-                    New
-                  </span>
                 </button>
               </li>
 
