@@ -117,6 +117,101 @@ const cityCoordinates = {
   Ahmednagar: { lat: 19.0948, lng: 74.748 },
 };
 
+// State capital/centroid fallback coordinates (for unmapped cities)
+const stateCoordinates = {
+  "andhra pradesh": { lat: 16.5062, lng: 80.648 }, // Vijayawada/Amaravati region
+  "arunachal pradesh": { lat: 27.0844, lng: 93.6053 }, // Itanagar
+  assam: { lat: 26.1445, lng: 91.7362 }, // Guwahati
+  bihar: { lat: 25.5941, lng: 85.1376 }, // Patna
+  chhattisgarh: { lat: 21.2514, lng: 81.6296 }, // Raipur
+  goa: { lat: 15.4909, lng: 73.8278 }, // Panaji
+  gujarat: { lat: 23.0225, lng: 72.5714 }, // Ahmedabad/Gandhinagar region
+  haryana: { lat: 28.4595, lng: 77.0266 }, // Gurgaon/Chandigarh region
+  "himachal pradesh": { lat: 31.1048, lng: 77.1734 }, // Shimla
+  jharkhand: { lat: 23.3441, lng: 85.3096 }, // Ranchi
+  karnataka: { lat: 12.9716, lng: 77.5946 }, // Bengaluru
+  kerala: { lat: 8.5241, lng: 76.9366 }, // Thiruvananthapuram
+  "madhya pradesh": { lat: 23.2599, lng: 77.4126 }, // Bhopal
+  maharashtra: { lat: 18.5204, lng: 73.8567 }, // Pune/Mumbai region
+  manipur: { lat: 24.817, lng: 93.9368 }, // Imphal
+  meghalaya: { lat: 25.5788, lng: 91.8933 }, // Shillong
+  mizoram: { lat: 23.7271, lng: 92.7176 }, // Aizawl
+  nagaland: { lat: 25.6672, lng: 94.1086 }, // Kohima
+  odisha: { lat: 20.2961, lng: 85.8245 }, // Bhubaneswar
+  punjab: { lat: 30.7333, lng: 76.7794 }, // Chandigarh
+  rajasthan: { lat: 26.9124, lng: 75.7873 }, // Jaipur
+  sikkim: { lat: 27.3314, lng: 88.6138 }, // Gangtok
+  "tamil nadu": { lat: 13.0827, lng: 80.2707 }, // Chennai
+  telangana: { lat: 17.385, lng: 78.4867 }, // Hyderabad
+  tripura: { lat: 23.8315, lng: 91.2868 }, // Agartala
+  "uttar pradesh": { lat: 26.8467, lng: 80.9462 }, // Lucknow
+  uttarakhand: { lat: 30.3165, lng: 78.0322 }, // Dehradun
+  "west bengal": { lat: 22.5726, lng: 88.3639 }, // Kolkata
+  delhi: { lat: 28.7041, lng: 77.1025 },
+  "jammu and kashmir": { lat: 34.0837, lng: 74.7973 }, // Srinagar/Jammu region
+  ladakh: { lat: 34.1526, lng: 77.577 }, // Leh
+  "andaman and nicobar islands": { lat: 11.6234, lng: 92.7265 }, // Port Blair
+  chandigarh: { lat: 30.7333, lng: 76.7794 },
+  dadra: { lat: 20.2763, lng: 73.0169 }, // Dadra & Nagar Haveli
+  daman: { lat: 20.3974, lng: 72.8328 }, // Daman & Diu
+  lakshadweep: { lat: 10.5667, lng: 72.6417 },
+  puducherry: { lat: 11.9416, lng: 79.8083 },
+  "daman and diu": { lat: 20.3974, lng: 72.8328 },
+  "dadra and nagar haveli": { lat: 20.2763, lng: 73.0169 },
+};
+
+// Build lower-cased lookup tables for flexible matching
+const cityCoordsLC = Object.fromEntries(
+  Object.entries(cityCoordinates).map(([k, v]) => [k.toLowerCase(), v])
+);
+const stateCoordsLC = stateCoordinates;
+
+// Common alternate names to improve hit rate
+const citySynonymsLC = {
+  bengaluru: "bangalore",
+  bengalooru: "bangalore",
+  bombay: "mumbai",
+  calcutta: "kolkata",
+  madras: "chennai",
+  mangaluru: "mangalore",
+  mysuru: "mysore",
+  gurugram: "gurgaon",
+  "pimpri-chinchwad": "pimpri",
+  trivandrum: "thiruvananthapuram",
+  prayagraj: "allahabad",
+};
+
+const stateSynonymsLC = {
+  up: "uttar pradesh",
+  mp: "madhya pradesh",
+  uk: "uttarakhand",
+  tn: "tamil nadu",
+  wb: "west bengal",
+  odisha: "odisha",
+  orissa: "odisha",
+  dl: "delhi",
+  karnatak: "karnataka",
+  mh: "maharashtra",
+  gj: "gujarat",
+};
+
+function normalize(value) {
+  if (!value || typeof value !== "string") return "";
+  return value.trim().toLowerCase();
+}
+
+function resolveCityCoords(cityLC) {
+  if (!cityLC) return null;
+  const canon = citySynonymsLC[cityLC] || cityLC;
+  return cityCoordsLC[canon] || null;
+}
+
+function resolveStateCoords(stateLC) {
+  if (!stateLC) return null;
+  const canon = stateSynonymsLC[stateLC] || stateLC;
+  return stateCoordsLC[canon] || null;
+}
+
 export async function GET() {
   try {
     await connectDB();
@@ -130,36 +225,57 @@ export async function GET() {
 
     orders.forEach((order) => {
       if (order.shippingAddress) {
-        const { city, state, zipCode } = order.shippingAddress;
+        const rawCity = order.shippingAddress.city || "";
+        const rawState = order.shippingAddress.state || "";
+        const zipCode =
+          order.shippingAddress.zipCode ||
+          order.shippingAddress.pincode ||
+          order.shippingAddress.pinCode ||
+          order.shippingAddress.postalCode;
 
-        if (city && state) {
-          // City statistics
-          const cityKey = `${city}-${state}`;
-          if (!cityMap.has(cityKey)) {
-            cityMap.set(cityKey, {
-              city,
-              state,
-              count: 0,
-              zipCodes: new Set(),
-              coordinates: cityCoordinates[city] || null,
-            });
-          }
-          const cityData = cityMap.get(cityKey);
-          cityData.count++;
-          if (zipCode) cityData.zipCodes.add(zipCode);
+        const cityLC = normalize(rawCity);
+        const stateLC = normalize(rawState);
 
-          // State statistics
-          if (!stateMap.has(state)) {
-            stateMap.set(state, {
-              state,
-              count: 0,
-              cities: new Set(),
-            });
-          }
-          const stateData = stateMap.get(state);
-          stateData.count++;
-          stateData.cities.add(city);
+        // Resolve coordinates: city first, then state centroid fallback
+        const cityCoords = resolveCityCoords(cityLC);
+        const stateCoords = resolveStateCoords(stateLC);
+
+        // Skip only if neither city nor state present
+        if (!cityLC && !stateLC) return;
+
+        const displayCity =
+          rawCity && rawCity.trim() ? rawCity.trim() : "Unknown";
+        const displayState =
+          rawState && rawState.trim() ? rawState.trim() : "Unknown";
+
+        const coords = cityCoords || stateCoords || null;
+
+        // City statistics (by city+state combo)
+        const cityKey = `${displayCity}-${displayState}`;
+        if (!cityMap.has(cityKey)) {
+          cityMap.set(cityKey, {
+            city: displayCity,
+            state: displayState,
+            count: 0,
+            zipCodes: new Set(),
+            coordinates: coords,
+          });
         }
+        const cityData = cityMap.get(cityKey);
+        cityData.count++;
+        if (zipCode) cityData.zipCodes.add(String(zipCode));
+
+        // State statistics
+        if (!stateMap.has(displayState)) {
+          stateMap.set(displayState, {
+            state: displayState,
+            count: 0,
+            cities: new Set(),
+          });
+        }
+        const stateData = stateMap.get(displayState);
+        stateData.count++;
+        stateData.cities.add(displayCity);
       }
     });
 
