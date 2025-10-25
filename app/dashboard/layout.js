@@ -1,10 +1,11 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function DashboardLayout({ children }) {
   const router = useRouter();
+  const pathname = usePathname();
   const [loading, setLoading] = useState(true);
   const [admin, setAdmin] = useState(null);
   const [sidebarVisible, setSidebarVisible] = useState(false);
@@ -227,6 +228,53 @@ export default function DashboardLayout({ children }) {
                   <span className="font-medium">Overview</span>
                 </button>
               </li>
+              {/* Demographics - moved up for visibility */}
+              <li>
+                <button
+                  onClick={() => {
+                    router.push("/dashboard/demographics");
+                    if (window.innerWidth < 1024) setSidebarVisible(false);
+                  }}
+                  className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-300 flex items-center gap-3 group ${
+                    pathname?.startsWith("/dashboard/demographics")
+                      ? "bg-teal-700 text-white"
+                      : "hover:bg-gray-700 text-gray-300"
+                  }`}
+                >
+                  <div
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 ${
+                      pathname?.startsWith("/dashboard/demographics")
+                        ? "bg-teal-600 text-white"
+                        : "bg-gray-700 text-gray-400 group-hover:bg-teal-600 group-hover:text-white"
+                    }`}
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                    </svg>
+                  </div>
+                  <span className="font-medium">Demographics</span>
+                  <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-teal-600/20 text-teal-300 border border-teal-600/30">
+                    New
+                  </span>
+                </button>
+              </li>
+
               <li>
                 <button
                   onClick={() => {
@@ -358,6 +406,7 @@ export default function DashboardLayout({ children }) {
                   <span className="font-medium">Coupons</span>
                 </button>
               </li>
+
               {/* New Shipping Settings Dropdown */}
               <li>
                 <div className="relative">
