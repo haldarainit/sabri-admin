@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import {
   Chart as ChartJS,
@@ -26,6 +27,12 @@ ChartJS.register(
   Tooltip,
   Legend,
   ArcElement
+);
+
+// Client-only demographics map (avoids SSR issues)
+const OverviewDemographics = dynamic(
+  () => import("@/components/OverviewDemographics"),
+  { ssr: false }
 );
 
 export default function Dashboard() {
@@ -612,6 +619,11 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Customer Demographics (Map) */}
+      <div className="mb-8">
+        <OverviewDemographics />
       </div>
 
       {/* Charts Section */}

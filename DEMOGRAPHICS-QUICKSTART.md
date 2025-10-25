@@ -1,14 +1,16 @@
-# 🗺️ Demographics Page - Quick Start Guide
+# 🗺️ Demographics Map - Quick Start Guide
 
 ## ✅ Implementation Complete!
 
-Your new Demographics page is now live and ready to use.
+Your demographics map is now embedded directly in the Dashboard Overview.
 
 ## 🚀 Access the Page
 
-1. **Open your browser** and go to: `http://localhost:3000`
-2. **Log in** to Sabri Admin (if not already logged in)
-3. **Click "Demographics"** in the sidebar (look for the map icon 🗺️)
+1. Open `http://localhost:3000`
+2. Log in to Sabri Admin
+3. Go to Dashboard → Overview (the map section is titled "Customer Demographics")
+
+Note: The old standalone route `/dashboard/demographics` now redirects to `/dashboard` to avoid duplication.
 
 ## 📍 What You'll See
 
@@ -19,7 +21,7 @@ Your new Demographics page is now live and ready to use.
 - **States Covered**: Number of states with orders
 - **Top City Orders**: Highest order count from a single city
 
-### Interactive Map (Center)
+### Interactive Map (Overview section)
 
 - **Markers**: Show customer locations
 - **Colors**: Indicate order volume
@@ -30,22 +32,15 @@ Your new Demographics page is now live and ready to use.
 - **Click markers** to see details (city, state, order count, zip codes)
 - **Zoom/Pan** using mouse or map controls
 
-### Filters (Left Panel)
+The embedded overview map is intentionally compact and focuses on a quick visual of order clusters. Advanced filters are available in the (now deprecated) standalone version and can be reintroduced later if needed.
 
-- **State Filter**: Show orders from specific state
-- **City Filter**: Narrow down to specific city
-- **Map View**: Switch between Street/Satellite/Terrain
+### Top Cities
 
-### Top Cities List (Left Panel)
+Shown within the map popup/context (detailed list available via API response if needed).
 
-- Shows top 10 cities by order count
-- Quick overview of your best markets
+### State Distribution
 
-### State Distribution Table (Bottom)
-
-- Complete breakdown by state
-- Shows orders, cities, and percentage
-- Sortable columns
+The embedded version focuses on the map. A state-wise table can be added back if required.
 
 ## 🎯 Common Use Cases
 
@@ -125,10 +120,11 @@ All data comes from **order shipping addresses** in your MongoDB database.
 
 If you need to customize:
 
-- **Page**: `app/dashboard/demographics/page.js`
-- **API**: `app/api/demographics/route.js`
-- **Docs**: `DEMOGRAPHICS-FEATURE.md`
-- **Summary**: `DEMOGRAPHICS-IMPLEMENTATION.md`
+- Map component: `components/OverviewDemographics.js`
+- API: `app/api/demographics/route.js`
+- Root layout (Leaflet CSS): `app/layout.js`
+- Legacy page (now redirects): `app/dashboard/demographics/page.js`
+- Docs: `DEMOGRAPHICS-FEATURE.md`, `DEMOGRAPHICS-IMPLEMENTATION.md`
 
 ## 🎨 Customization Ideas
 
@@ -167,7 +163,7 @@ Change order count thresholds in `getColor()` function.
 
 ## 🎉 You're All Set!
 
-The Demographics page is fully functional and integrated into your Sabri Admin dashboard. Start exploring your customer locations and gaining valuable market insights!
+The demographics map is fully functional and integrated into your Sabri Admin dashboard Overview. Start exploring your customer locations and gaining valuable market insights!
 
 ---
 

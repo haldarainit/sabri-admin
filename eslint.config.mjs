@@ -10,7 +10,7 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
-  ...compat.extends("next/core-web-vitals"),
+  // Global ignores (applies to all following configs)
   {
     ignores: [
       "node_modules/**",
@@ -19,6 +19,9 @@ const eslintConfig = [
       "build/**",
       "next-env.d.ts",
     ],
+  },
+  ...compat.extends("next/core-web-vitals"),
+  {
     rules: {
       // Allow quote characters in JSX text without needing HTML entities
       "react/no-unescaped-entities": "off",
