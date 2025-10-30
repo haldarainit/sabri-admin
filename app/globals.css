@@ -1,0 +1,115 @@
+@import "tailwindcss";
+
+/* Shopify-inspired Design System */
+:root {
+  /* Shopify Colors */
+  --shopify-bg-primary: #f1f2f4;
+  --shopify-bg-secondary: #ffffff;
+  --shopify-bg-tertiary: #f6f6f7;
+  --shopify-bg-dark: #1a1a1a;
+
+  --shopify-surface: #ffffff;
+  --shopify-surface-subdued: #fafbfb;
+  --shopify-surface-hover: #f6f6f7;
+  --shopify-surface-selected: #f1f2f4;
+
+  --shopify-border: #e1e3e5;
+  --shopify-border-subdued: #f1f2f4;
+  --shopify-border-hover: #c9cccf;
+
+  --shopify-text-primary: #202223;
+  --shopify-text-secondary: #6d7175;
+  --shopify-text-disabled: #8c9196;
+  --shopify-text-inverse: #ffffff;
+
+  --shopify-action-primary: #008060;
+  --shopify-action-primary-hover: #006e52;
+  --shopify-action-primary-pressed: #005c45;
+
+  --shopify-action-critical: #d72c0d;
+  --shopify-action-critical-hover: #bf2711;
+
+  --shopify-interactive: #2c6ecb;
+  --shopify-interactive-hover: #1f5199;
+
+  /* Shadows */
+  --shopify-shadow-sm: 0 1px 0 0 rgba(0, 0, 0, 0.05);
+  --shopify-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --shopify-shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+  --shopify-shadow-xl: 0 16px 24px rgba(0, 0, 0, 0.15);
+
+  /* Border Radius */
+  --shopify-radius-sm: 4px;
+  --shopify-radius-md: 8px;
+  --shopify-radius-lg: 12px;
+}
+
+/* Typography - Shopify uses SF Pro Display / Inter-like system fonts */
+body,
+button,
+input,
+select,
+textarea {
+  font-family: var(
+    --font-outfit,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif
+  );
+  color: var(--shopify-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Shopify-style scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--shopify-bg-tertiary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c9cccf;
+  border-radius: 6px;
+  border: 3px solid var(--shopify-bg-tertiary);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8c9196;
+}
+
+/* Shopify-style focus rings */
+*:focus-visible {
+  outline: 2px solid var(--shopify-interactive);
+  outline-offset: 2px;
+}
+
+/* Smooth transitions */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Ensure green buttons have white text */
+button[style*="shopify-action-primary"],
+[style*="backgroundColor"][style*="shopify-action-primary"] button,
+[style*="background-color"][style*="shopify-action-primary"] button,
+[style*="backgroundColor: var(--shopify-action-primary)"],
+[style*="background-color: var(--shopify-action-primary)"] {
+  color: white !important;
+}
+
+/* Ensure green buttons SVG icons are white */
+button[style*="shopify-action-primary"] svg,
+[style*="backgroundColor: var(--shopify-action-primary)"] svg {
+  color: white !important;
+  stroke: white !important;
+}
