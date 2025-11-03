@@ -458,8 +458,39 @@ export default function DashboardLayout({ children }) {
                   <span>Customers</span>
                 </button>
               </li>
-
-              {/* Divider */}
+              <li>
+                <button
+                  onClick={() => {
+                    router.push("/dashboard/reviews");
+                    if (window.innerWidth < 1024) setSidebarVisible(false);
+                  }}
+                  className="w-full text-left px-3 py-2.5 rounded-lg transition-all duration-200 flex items-center gap-3 group font-medium text-sm"
+                  style={{ color: "var(--shopify-text-primary)" }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.backgroundColor =
+                      "var(--shopify-surface-hover)")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.backgroundColor = "transparent")
+                  }
+                >
+                  <svg
+                    className="w-5 h-5"
+                    style={{ color: "var(--shopify-text-secondary)" }}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+                    />
+                  </svg>
+                  <span>Reviews</span>
+                </button>
+              </li>
               <li className="py-2">
                 <div
                   className="border-t"
