@@ -7,6 +7,7 @@ export default function RichTextEditor({
   onSave,
   onClose,
   title = "Rich Text Editor",
+  policyType = null,
 }) {
   const [content, setContent] = useState(initialContent);
   const [showHTML, setShowHTML] = useState(false);
@@ -17,6 +18,10 @@ export default function RichTextEditor({
   const [showTableSelector, setShowTableSelector] = useState(false);
   const [tableSize, setTableSize] = useState({ rows: 2, cols: 2 });
   const [isSelecting, setIsSelecting] = useState(false);
+  const [showAIPrompt, setShowAIPrompt] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generationError, setGenerationError] = useState(null);
   const editorRef = useRef(null);
 
   const formatOptions = [
@@ -468,6 +473,71 @@ export default function RichTextEditor({
     }
   }, [isClient, isSelecting]);
 
+  // Close AI prompt modal when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showAIPrompt && !event.target.closest('.ai-prompt-container')) {
+        setShowAIPrompt(false);
+        setAiPrompt("");
+        setGenerationError(null);
+      }
+    };
+    if (isClient) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [showAIPrompt, isClient]);
+
+  const handleAIGenerate = async () => {
+    if (!aiPrompt.trim()) {
+      setGenerationError("Please enter a prompt describing what you want to generate.");
+      return;
+    }
+    if (!policyType) {
+      setGenerationError("Policy type is required for AI generation.");
+      return;
+    }
+    setIsGenerating(true);
+    setGenerationError(null);
+    try {
+      const response = await fetch('/api/generate-policy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          policyType,
+          userPrompt: aiPrompt,
+          businessInfo: {
+            name: "[YOUR BUSINESS NAME]",
+            type: "E-commerce",
+            email: "[CONTACT EMAIL]",
+            website: "[YOUR WEBSITE]",
+          },
+        }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate policy content');
+      }
+      const data = await response.json();
+      const generatedContent = data.content;
+      if (editorRef.current && isClient) {
+        editorRef.current.innerHTML = generatedContent;
+        setContent(generatedContent);
+        setHtmlContent(generatedContent);
+        setForceRender((prev) => prev + 1);
+      }
+      setShowAIPrompt(false);
+      setAiPrompt("");
+    } catch (error) {
+      console.error('AI Generation Error:', error);
+      setGenerationError(error.message || "Failed to generate content. Please try again.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div
@@ -536,6 +606,20 @@ export default function RichTextEditor({
                 Editor
               </h3>
               <div className="flex gap-2">
+                {policyType && (
+                  <button
+                    onClick={() => setShowAIPrompt(true)}
+                    className="px-3 py-1.5 text-sm rounded-lg transition-all duration-200 font-medium flex items-center gap-2"
+                    style={{ color: "white", backgroundColor: "#7C3AED", border: "none" }}
+                    title="Generate content with AI"
+                  >
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d="M5 12c2.5-.5 4-2 4.5-4.5C10 10 11.5 11.5 14 12c-2.5.5-4 2-4.5 4.5C9 14 7.5 12.5 5 12z" />
+                      <path d="M17 5l1 3 3 1-3 1-1 3-1-3-3-1 3-1 1-3z" />
+                    </svg>
+                    AI Generate
+                  </button>
+                )}
                 <button
                   onClick={toggleHTMLView}
                   className="px-3 py-1.5 text-sm rounded-lg transition-all duration-200"
@@ -1218,6 +1302,111 @@ export default function RichTextEditor({
                   }}
                 >
                   Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* AI Prompt Modal */}
+        {showAIPrompt && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center ai-prompt-container"
+            style={{ backgroundColor: "rgba(0, 0, 0, 0.6)" }}
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setShowAIPrompt(false);
+                setAiPrompt("");
+                setGenerationError(null);
+              }
+            }}
+          >
+            <div
+              className="p-6 rounded-lg shadow-xl border bg-white max-w-md w-full mx-4"
+              style={{
+                backgroundColor: "var(--shopify-surface)",
+                borderColor: "var(--shopify-border)",
+                boxShadow: "0 20px 50px rgba(0,0,0,0.3)",
+              }}
+            >
+              <div className="text-center mb-4">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M5 12c2.5-.5 4-2 4.5-4.5C10 10 11.5 11.5 14 12c-2.5.5-4 2-4.5 4.5C9 14 7.5 12.5 5 12z" />
+                    <path d="M17 5l1 3 3 1-3 1-1 3-1-3-3-1 3-1 1-3z" />
+                  </svg>
+                  <h3 className="text-lg font-semibold" style={{ color: "var(--shopify-text-primary)" }}>
+                    AI Policy Generator
+                  </h3>
+                </div>
+                {policyType && (
+                  <div className="text-sm" style={{ color: "var(--shopify-text-secondary)" }}>
+                    Generating: <strong>{policyType}</strong>
+                  </div>
+                )}
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-2" style={{ color: "var(--shopify-text-primary)" }}>
+                  Describe what you want in your policy:
+                </label>
+                <textarea
+                  value={aiPrompt}
+                  onChange={(e) => setAiPrompt(e.target.value)}
+                  placeholder="e.g., Include 30-day return window, require original packaging, exclude sale items..."
+                  className="w-full p-3 border rounded-lg resize-none text-sm"
+                  style={{
+                    backgroundColor: "var(--shopify-surface)",
+                    borderColor: "var(--shopify-border)",
+                    color: "var(--shopify-text-primary)",
+                    minHeight: "100px",
+                  }}
+                  rows={4}
+                  disabled={isGenerating}
+                />
+              </div>
+
+              {generationError && (
+                <div className="mb-4 p-3 rounded-lg" style={{ backgroundColor: "#FEF2F2", border: "1px solid #FECACA" }}>
+                  <div className="flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="text-sm" style={{ color: "#B91C1C" }}>{generationError}</span>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => {
+                    setShowAIPrompt(false);
+                    setAiPrompt("");
+                    setGenerationError(null);
+                  }}
+                  className="px-4 py-2 text-sm rounded-lg transition-all duration-200 font-medium"
+                  style={{ color: "var(--shopify-text-secondary)", backgroundColor: "var(--shopify-surface-hover)" }}
+                  disabled={isGenerating}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAIGenerate}
+                  className="px-4 py-2 text-sm rounded-lg text-white transition-all duration-200 font-medium flex items-center gap-2"
+                  style={{ backgroundColor: "#7C3AED" }}
+                  disabled={isGenerating || !aiPrompt.trim()}
+                >
+                  {isGenerating ? (
+                    <>
+                      <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Generating...
+                    </>
+                  ) : (
+                    <>Generate Policy</>
+                  )}
                 </button>
               </div>
             </div>

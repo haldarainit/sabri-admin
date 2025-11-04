@@ -338,6 +338,7 @@ export default function PoliciesPage() {
         <ErrorBoundary>
           <RichTextEditor
             title={`Edit ${currentPolicy.title}`}
+            policyType={currentPolicy.title}
             initialContent={
               policyContents[currentPolicy.key] ||
               `<h2>${
