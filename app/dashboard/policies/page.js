@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import RichTextEditor from "../../../components/RichTextEditor";
 import ErrorBoundary from "../../../components/ErrorBoundary";
 
@@ -8,10 +8,13 @@ export default function PoliciesPage() {
   const [showEditor, setShowEditor] = useState(false);
   const [currentPolicy, setCurrentPolicy] = useState(null);
   const [policyContents, setPolicyContents] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const [policies] = useState([
     {
       id: 1,
+      key: "return_refund",
       title: "Return and refund policy",
       icon: (
         <svg
@@ -32,6 +35,7 @@ export default function PoliciesPage() {
     },
     {
       id: 2,
+      key: "privacy",
       title: "Privacy policy",
       icon: (
         <svg
@@ -52,6 +56,7 @@ export default function PoliciesPage() {
     },
     {
       id: 3,
+      key: "terms",
       title: "Terms of service",
       icon: (
         <svg
@@ -72,6 +77,7 @@ export default function PoliciesPage() {
     },
     {
       id: 4,
+      key: "shipping",
       title: "Shipping policy",
       icon: (
         <svg
@@ -92,6 +98,7 @@ export default function PoliciesPage() {
     },
     {
       id: 5,
+      key: "contact",
       title: "Contact information",
       icon: (
         <svg
@@ -112,19 +119,55 @@ export default function PoliciesPage() {
     },
   ]);
 
+  useEffect(() => {
+    let isActive = true;
+    async function loadPolicies() {
+      try {
+        setLoading(true);
+        setError("");
+        const res = await fetch("/api/admin/policies", { cache: "no-store" });
+        if (!res.ok) throw new Error("Failed to load policies");
+        const json = await res.json();
+        if (json?.success && Array.isArray(json.data)) {
+          const map = {};
+          for (const p of json.data) {
+            if (p?.key) map[p.key] = p.content || "";
+          }
+          if (isActive) setPolicyContents(map);
+        }
+      } catch (e) {
+        if (isActive) setError("Could not load saved policies.");
+      } finally {
+        if (isActive) setLoading(false);
+      }
+    }
+    loadPolicies();
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
   const handlePolicyClick = (policy) => {
     setCurrentPolicy(policy);
     setShowEditor(true);
   };
 
-  const handleSavePolicy = (content) => {
-    if (currentPolicy) {
-      setPolicyContents((prev) => ({
-        ...prev,
-        [currentPolicy.id]: content,
-      }));
+  const handleSavePolicy = async (content) => {
+    if (!currentPolicy) return;
+    try {
+      setError("");
+      const key = currentPolicy.key;
+      const res = await fetch(`/api/admin/policies/${key}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: currentPolicy.title, content }),
+      });
+      if (!res.ok) throw new Error("Failed to save policy");
+      setPolicyContents((prev) => ({ ...prev, [key]: content }));
       setShowEditor(false);
       setCurrentPolicy(null);
+    } catch (e) {
+      setError("Could not save policy. Please try again.");
     }
   };
 
@@ -296,7 +339,7 @@ export default function PoliciesPage() {
           <RichTextEditor
             title={`Edit ${currentPolicy.title}`}
             initialContent={
-              policyContents[currentPolicy.id] ||
+              policyContents[currentPolicy.key] ||
               `<h2>${
                 currentPolicy.title
               }</h2><p>Start writing your ${currentPolicy.title.toLowerCase()} content here...</p>`
