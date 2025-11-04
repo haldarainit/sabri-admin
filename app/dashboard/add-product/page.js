@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import RichTextEditor from "../../../components/RichTextEditor";
 
 export default function AddProductPage() {
+  const [showDescriptionEditor, setShowDescriptionEditor] = useState(false);
+
   const [form, setForm] = useState({
     name: "",
     price: 0,
@@ -1436,7 +1439,7 @@ export default function AddProductPage() {
                 )}
               </div>
 
-              {/* Description */}
+              {/* Description - Rich Text Editor */}
               <div>
                 <label
                   className="block text-sm font-medium mb-1.5"
@@ -1444,12 +1447,10 @@ export default function AddProductPage() {
                 >
                   Description
                 </label>
-                <textarea
-                  name="description"
-                  placeholder="Elegant pearl drop necklace for special occasions. Handcrafted with premium materials..."
-                  value={form.description}
-                  onChange={handleChange}
-                  className={`w-full px-3 py-2 rounded-lg text-sm transition-all ${
+
+                {/* Description Preview or Placeholder */}
+                <div
+                  className={`w-full px-3 py-3 rounded-lg text-sm border mb-2 description-preview ${
                     errors.description ? "border-red-500" : ""
                   }`}
                   style={{
@@ -1458,23 +1459,110 @@ export default function AddProductPage() {
                       errors.description ? "#d72c0d" : "var(--shopify-border)"
                     }`,
                     color: "var(--shopify-text-primary)",
+                    minHeight: "120px",
+                    maxHeight: "200px",
+                    overflowY: "auto",
                   }}
-                  onFocus={(e) =>
-                    !errors.description &&
-                    (e.currentTarget.style.borderColor =
-                      "var(--shopify-interactive)")
+                >
+                  {form.description ? (
+                    <div
+                      className="description-content"
+                      dangerouslySetInnerHTML={{ __html: form.description }}
+                      style={{
+                        color: "var(--shopify-text-primary)",
+                        fontSize: "14px",
+                        lineHeight: "1.6",
+                      }}
+                    />
+                  ) : (
+                    <p
+                      style={{
+                        color: "var(--shopify-text-secondary)",
+                        fontStyle: "italic",
+                      }}
+                    >
+                      Click "Edit Description" to add rich formatted content
+                      with AI assistance...
+                    </p>
+                  )}
+                </div>
+
+                <style jsx>{`
+                  .description-preview .description-content h1,
+                  .description-preview .description-content h2,
+                  .description-preview .description-content h3,
+                  .description-preview .description-content h4 {
+                    font-weight: 600;
+                    margin: 0.5em 0;
+                    line-height: 1.3;
+                    color: var(--shopify-text-primary);
                   }
-                  onBlur={(e) =>
-                    !errors.description &&
-                    (e.currentTarget.style.borderColor =
-                      "var(--shopify-border)")
+                  .description-preview .description-content h1 {
+                    font-size: 1.5em;
                   }
-                  rows={4}
-                  required
-                />
+                  .description-preview .description-content h2 {
+                    font-size: 1.3em;
+                  }
+                  .description-preview .description-content h3 {
+                    font-size: 1.15em;
+                  }
+                  .description-preview .description-content h4 {
+                    font-size: 1em;
+                  }
+                  .description-preview .description-content p {
+                    margin: 0.5em 0;
+                    line-height: 1.6;
+                  }
+                  .description-preview .description-content strong {
+                    font-weight: 600;
+                  }
+                  .description-preview .description-content em {
+                    font-style: italic;
+                  }
+                  .description-preview .description-content ul,
+                  .description-preview .description-content ol {
+                    margin: 0.5em 0;
+                    padding-left: 1.5em;
+                  }
+                  .description-preview .description-content li {
+                    margin: 0.25em 0;
+                  }
+                `}</style>
+
+                {/* Edit Description Button */}
+                <button
+                  type="button"
+                  onClick={() => setShowDescriptionEditor(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors"
+                  style={{ backgroundColor: "var(--shopify-action-primary)" }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.backgroundColor =
+                      "var(--shopify-action-primary-hover)")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.backgroundColor =
+                      "var(--shopify-action-primary)")
+                  }
+                >
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                    />
+                  </svg>
+                  Edit Description
+                </button>
+
                 {errors.description && (
                   <p
-                    className="text-xs mt-1"
+                    className="text-xs mt-2"
                     style={{ color: "var(--shopify-action-critical)" }}
                   >
                     {errors.description}
@@ -2563,6 +2651,26 @@ export default function AddProductPage() {
             </button>
           </div>
         </form>
+      )}
+
+      {/* Rich Text Editor Modal for Description */}
+      {showDescriptionEditor && (
+        <RichTextEditor
+          title="Edit Product Description"
+          contentType="product-description"
+          initialContent={
+            form.description || "<p>Describe your product in detail...</p>"
+          }
+          onSave={(content) => {
+            setForm({ ...form, description: content });
+            setShowDescriptionEditor(false);
+            // Clear description error if present
+            if (errors.description) {
+              setErrors({ ...errors, description: "" });
+            }
+          }}
+          onClose={() => setShowDescriptionEditor(false)}
+        />
       )}
     </div>
   );

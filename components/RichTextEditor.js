@@ -8,6 +8,7 @@ export default function RichTextEditor({
   onClose,
   title = "Rich Text Editor",
   policyType = null,
+  contentType = "policy", // "policy" or "product-description"
 }) {
   const [content, setContent] = useState(initialContent);
   const [showHTML, setShowHTML] = useState(false);
@@ -165,6 +166,22 @@ export default function RichTextEditor({
         }
         .editor-content font {
           display: inline !important;
+        }
+        .editor-content table {
+          border-collapse: collapse !important;
+          width: 100% !important;
+          margin: 10px 0 !important;
+        }
+        .editor-content table td,
+        .editor-content table th {
+          border: 1px solid #ccc !important;
+          padding: 8px !important;
+          min-width: 100px !important;
+          min-height: 30px !important;
+        }
+        .editor-content table th {
+          background-color: #f3f4f6 !important;
+          font-weight: bold !important;
         }
       `;
       document.head.appendChild(styleElement);
@@ -476,63 +493,98 @@ export default function RichTextEditor({
   // Close AI prompt modal when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (showAIPrompt && !event.target.closest('.ai-prompt-container')) {
+      if (showAIPrompt && !event.target.closest(".ai-prompt-container")) {
         setShowAIPrompt(false);
         setAiPrompt("");
         setGenerationError(null);
       }
     };
     if (isClient) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
       return () => {
-        document.removeEventListener('mousedown', handleClickOutside);
+        document.removeEventListener("mousedown", handleClickOutside);
       };
     }
   }, [showAIPrompt, isClient]);
 
   const handleAIGenerate = async () => {
     if (!aiPrompt.trim()) {
-      setGenerationError("Please enter a prompt describing what you want to generate.");
+      setGenerationError(
+        "Please enter a prompt describing what you want to generate."
+      );
       return;
     }
-    if (!policyType) {
+
+    // For policies, policyType is required
+    if (contentType === "policy" && !policyType) {
       setGenerationError("Policy type is required for AI generation.");
       return;
     }
+
     setIsGenerating(true);
     setGenerationError(null);
+
     try {
-      const response = await fetch('/api/generate-policy', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          policyType,
-          userPrompt: aiPrompt,
-          businessInfo: {
-            name: "[YOUR BUSINESS NAME]",
-            type: "E-commerce",
-            email: "[CONTACT EMAIL]",
-            website: "[YOUR WEBSITE]",
-          },
-        }),
+      // Choose the appropriate API endpoint based on content type
+      const endpoint =
+        contentType === "product-description"
+          ? "/api/generate-description"
+          : "/api/generate-policy";
+
+      // Prepare request body based on content type
+      const requestBody =
+        contentType === "product-description"
+          ? {
+              userPrompt: aiPrompt,
+              productInfo: {
+                // You can pass product info if available
+                // For now, we'll let the user's prompt provide context
+              },
+            }
+          : {
+              policyType,
+              userPrompt: aiPrompt,
+              businessInfo: {
+                name: "[YOUR BUSINESS NAME]",
+                type: "E-commerce",
+                email: "[CONTACT EMAIL]",
+                website: "[YOUR WEBSITE]",
+              },
+            };
+
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody),
       });
+
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to generate policy content');
+        throw new Error(
+          errorData.error ||
+            `Failed to generate ${
+              contentType === "product-description" ? "description" : "policy"
+            } content`
+        );
       }
+
       const data = await response.json();
       const generatedContent = data.content;
+
       if (editorRef.current && isClient) {
         editorRef.current.innerHTML = generatedContent;
         setContent(generatedContent);
         setHtmlContent(generatedContent);
         setForceRender((prev) => prev + 1);
       }
+
       setShowAIPrompt(false);
       setAiPrompt("");
     } catch (error) {
-      console.error('AI Generation Error:', error);
-      setGenerationError(error.message || "Failed to generate content. Please try again.");
+      console.error("AI Generation Error:", error);
+      setGenerationError(
+        error.message || "Failed to generate content. Please try again."
+      );
     } finally {
       setIsGenerating(false);
     }
@@ -606,14 +658,24 @@ export default function RichTextEditor({
                 Editor
               </h3>
               <div className="flex gap-2">
-                {policyType && (
+                {/* Show AI button for both policies (with policyType) and product descriptions */}
+                {(policyType || contentType === "product-description") && (
                   <button
                     onClick={() => setShowAIPrompt(true)}
                     className="px-3 py-1.5 text-sm rounded-lg transition-all duration-200 font-medium flex items-center gap-2"
-                    style={{ color: "white", backgroundColor: "#7C3AED", border: "none" }}
+                    style={{
+                      color: "white",
+                      backgroundColor: "#7C3AED",
+                      border: "none",
+                    }}
                     title="Generate content with AI"
                   >
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <svg
+                      className="w-4 h-4"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
                       <path d="M5 12c2.5-.5 4-2 4.5-4.5C10 10 11.5 11.5 14 12c-2.5.5-4 2-4.5 4.5C9 14 7.5 12.5 5 12z" />
                       <path d="M17 5l1 3 3 1-3 1-1 3-1-3-3-1 3-1 1-3z" />
                     </svg>
@@ -1331,29 +1393,59 @@ export default function RichTextEditor({
             >
               <div className="text-center mb-4">
                 <div className="flex items-center justify-center gap-2 mb-2">
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <svg
+                    className="w-5 h-5"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
                     <path d="M5 12c2.5-.5 4-2 4.5-4.5C10 10 11.5 11.5 14 12c-2.5.5-4 2-4.5 4.5C9 14 7.5 12.5 5 12z" />
                     <path d="M17 5l1 3 3 1-3 1-1 3-1-3-3-1 3-1 1-3z" />
                   </svg>
-                  <h3 className="text-lg font-semibold" style={{ color: "var(--shopify-text-primary)" }}>
-                    AI Policy Generator
+                  <h3
+                    className="text-lg font-semibold"
+                    style={{ color: "var(--shopify-text-primary)" }}
+                  >
+                    {contentType === "product-description"
+                      ? "AI Description Generator"
+                      : "AI Policy Generator"}
                   </h3>
                 </div>
-                {policyType && (
-                  <div className="text-sm" style={{ color: "var(--shopify-text-secondary)" }}>
+                {policyType && contentType === "policy" && (
+                  <div
+                    className="text-sm"
+                    style={{ color: "var(--shopify-text-secondary)" }}
+                  >
                     Generating: <strong>{policyType}</strong>
+                  </div>
+                )}
+                {contentType === "product-description" && (
+                  <div
+                    className="text-sm"
+                    style={{ color: "var(--shopify-text-secondary)" }}
+                  >
+                    Generate compelling product description
                   </div>
                 )}
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-medium mb-2" style={{ color: "var(--shopify-text-primary)" }}>
-                  Describe what you want in your policy:
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: "var(--shopify-text-primary)" }}
+                >
+                  {contentType === "product-description"
+                    ? "Describe what you want in your product description:"
+                    : "Describe what you want in your policy:"}
                 </label>
                 <textarea
                   value={aiPrompt}
                   onChange={(e) => setAiPrompt(e.target.value)}
-                  placeholder="e.g., Include 30-day return window, require original packaging, exclude sale items..."
+                  placeholder={
+                    contentType === "product-description"
+                      ? "e.g., Elegant jewelry piece, handcrafted with premium materials, perfect for special occasions, emphasize craftsmanship and quality..."
+                      : "e.g., Include 30-day return window, require original packaging, exclude sale items..."
+                  }
                   className="w-full p-3 border rounded-lg resize-none text-sm"
                   style={{
                     backgroundColor: "var(--shopify-surface)",
@@ -1367,12 +1459,30 @@ export default function RichTextEditor({
               </div>
 
               {generationError && (
-                <div className="mb-4 p-3 rounded-lg" style={{ backgroundColor: "#FEF2F2", border: "1px solid #FECACA" }}>
+                <div
+                  className="mb-4 p-3 rounded-lg"
+                  style={{
+                    backgroundColor: "#FEF2F2",
+                    border: "1px solid #FECACA",
+                  }}
+                >
                   <div className="flex items-center gap-2">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
                     </svg>
-                    <span className="text-sm" style={{ color: "#B91C1C" }}>{generationError}</span>
+                    <span className="text-sm" style={{ color: "#B91C1C" }}>
+                      {generationError}
+                    </span>
                   </div>
                 </div>
               )}
@@ -1385,7 +1495,10 @@ export default function RichTextEditor({
                     setGenerationError(null);
                   }}
                   className="px-4 py-2 text-sm rounded-lg transition-all duration-200 font-medium"
-                  style={{ color: "var(--shopify-text-secondary)", backgroundColor: "var(--shopify-surface-hover)" }}
+                  style={{
+                    color: "var(--shopify-text-secondary)",
+                    backgroundColor: "var(--shopify-surface-hover)",
+                  }}
                   disabled={isGenerating}
                 >
                   Cancel
@@ -1398,14 +1511,33 @@ export default function RichTextEditor({
                 >
                   {isGenerating ? (
                     <>
-                      <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      <svg
+                        className="w-4 h-4 animate-spin"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
                       </svg>
                       Generating...
                     </>
                   ) : (
-                    <>Generate Policy</>
+                    <>
+                      {contentType === "product-description"
+                        ? "Generate Description"
+                        : "Generate Policy"}
+                    </>
                   )}
                 </button>
               </div>
