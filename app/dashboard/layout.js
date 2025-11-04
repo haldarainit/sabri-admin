@@ -599,6 +599,39 @@ export default function DashboardLayout({ children }) {
                   <span>Analytics</span>
                 </button>
               </li>
+              <li>
+                <button
+                  onClick={() => {
+                    router.push("/dashboard/policies");
+                    if (window.innerWidth < 1024) setSidebarVisible(false);
+                  }}
+                  className="w-full text-left px-3 py-2.5 rounded-lg transition-all duration-200 flex items-center gap-3 group font-medium text-sm"
+                  style={{ color: "var(--shopify-text-primary)" }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.backgroundColor =
+                      "var(--shopify-surface-hover)")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.backgroundColor = "transparent")
+                  }
+                >
+                  <svg
+                    className="w-5 h-5"
+                    style={{ color: "var(--shopify-text-secondary)" }}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                  <span>Policies</span>
+                </button>
+              </li>
 
               {/* Shipping Settings Dropdown */}
               <li>
