@@ -320,8 +320,8 @@ export default function AddProductPage() {
       return;
     }
 
-    // Validate file types
-    const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+    // Validate file types (including GIF for animated images)
+    const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"];
     const invalidFiles = files.filter(
       (file) => !validTypes.includes(file.type)
     );
@@ -330,7 +330,7 @@ export default function AddProductPage() {
       alert(
         `Invalid file types detected: ${invalidFiles
           .map((f) => f.name)
-          .join(", ")}. Please upload only JPEG, PNG, or WebP images.`
+          .join(", ")}. Please upload only JPEG, PNG, WebP, or GIF images.`
       );
       e.target.value = "";
       return;
@@ -414,9 +414,8 @@ export default function AddProductPage() {
       if (res.ok && result.success) {
         setBulkImageResult({
           success: true,
-          message: `${
-            result.totalUploaded || result.data.length
-          } images uploaded successfully to Cloudinary`,
+          message: `${result.totalUploaded || result.data.length
+            } images uploaded successfully to Cloudinary`,
           uploadedImages: result.data,
           errors: result.errors || [],
           summary: {
@@ -525,9 +524,8 @@ export default function AddProductPage() {
         <button
           type="button"
           onClick={() => setActiveTab("single")}
-          className={`px-4 py-3 text-sm font-medium transition-colors relative ${
-            activeTab === "single" ? "border-b-2" : ""
-          }`}
+          className={`px-4 py-3 text-sm font-medium transition-colors relative ${activeTab === "single" ? "border-b-2" : ""
+            }`}
           style={{
             color:
               activeTab === "single"
@@ -544,9 +542,8 @@ export default function AddProductPage() {
         <button
           type="button"
           onClick={() => setActiveTab("bulk")}
-          className={`px-4 py-3 text-sm font-medium transition-colors relative ${
-            activeTab === "bulk" ? "border-b-2" : ""
-          }`}
+          className={`px-4 py-3 text-sm font-medium transition-colors relative ${activeTab === "bulk" ? "border-b-2" : ""
+            }`}
           style={{
             color:
               activeTab === "bulk"
@@ -670,12 +667,12 @@ export default function AddProductPage() {
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm text-white transition-colors"
                 style={{ backgroundColor: "var(--shopify-action-primary)" }}
                 onMouseEnter={(e) =>
-                  (e.currentTarget.style.backgroundColor =
-                    "var(--shopify-action-primary-hover)")
+                (e.currentTarget.style.backgroundColor =
+                  "var(--shopify-action-primary-hover)")
                 }
                 onMouseLeave={(e) =>
-                  (e.currentTarget.style.backgroundColor =
-                    "var(--shopify-action-primary)")
+                (e.currentTarget.style.backgroundColor =
+                  "var(--shopify-action-primary)")
                 }
               >
                 <svg
@@ -788,9 +785,8 @@ export default function AddProductPage() {
                   backgroundColor: bulkUploadResult.success
                     ? "#f0fdf4"
                     : "#fef2f2",
-                  border: `1px solid ${
-                    bulkUploadResult.success ? "#86efac" : "#fecaca"
-                  }`,
+                  border: `1px solid ${bulkUploadResult.success ? "#86efac" : "#fecaca"
+                    }`,
                 }}
               >
                 <p
@@ -905,8 +901,8 @@ export default function AddProductPage() {
                   color: "var(--shopify-text-primary)",
                 }}
                 onFocus={(e) =>
-                  (e.currentTarget.style.borderColor =
-                    "var(--shopify-action-interactive)")
+                (e.currentTarget.style.borderColor =
+                  "var(--shopify-action-interactive)")
                 }
                 onBlur={(e) =>
                   (e.currentTarget.style.borderColor = "var(--shopify-border)")
@@ -985,12 +981,12 @@ export default function AddProductPage() {
                         borderColor: "var(--shopify-border)",
                       }}
                       onMouseEnter={(e) =>
-                        (e.currentTarget.style.backgroundColor =
-                          "var(--shopify-surface-hover)")
+                      (e.currentTarget.style.backgroundColor =
+                        "var(--shopify-surface-hover)")
                       }
                       onMouseLeave={(e) =>
-                        (e.currentTarget.style.backgroundColor =
-                          "var(--shopify-surface)")
+                      (e.currentTarget.style.backgroundColor =
+                        "var(--shopify-surface)")
                       }
                     >
                       <div className="flex items-center justify-between gap-2 mb-2">
@@ -1012,8 +1008,8 @@ export default function AddProductPage() {
                             (e.currentTarget.style.backgroundColor = "#FDE7E9")
                           }
                           onMouseLeave={(e) =>
-                            (e.currentTarget.style.backgroundColor =
-                              "transparent")
+                          (e.currentTarget.style.backgroundColor =
+                            "transparent")
                           }
                           title="Remove"
                         >
@@ -1131,9 +1127,9 @@ export default function AddProductPage() {
                   <span className="font-semibold">
                     {bulkImageFiles.length > 0
                       ? Math.round(
-                          (bulkImageUploadProgress / bulkImageFiles.length) *
-                            100
-                        )
+                        (bulkImageUploadProgress / bulkImageFiles.length) *
+                        100
+                      )
                       : 0}
                     %
                   </span>
@@ -1146,12 +1142,11 @@ export default function AddProductPage() {
                     className="h-2 rounded-full transition-all duration-300"
                     style={{
                       backgroundColor: "var(--shopify-action-primary)",
-                      width: `${
-                        bulkImageFiles.length > 0
-                          ? (bulkImageUploadProgress / bulkImageFiles.length) *
-                            100
-                          : 0
-                      }%`,
+                      width: `${bulkImageFiles.length > 0
+                        ? (bulkImageUploadProgress / bulkImageFiles.length) *
+                        100
+                        : 0
+                        }%`,
                     }}
                   ></div>
                 </div>
@@ -1253,12 +1248,12 @@ export default function AddProductPage() {
                                         "var(--shopify-interactive)",
                                     }}
                                     onMouseEnter={(e) =>
-                                      (e.currentTarget.style.backgroundColor =
-                                        "var(--shopify-interactive-hover)")
+                                    (e.currentTarget.style.backgroundColor =
+                                      "var(--shopify-interactive-hover)")
                                     }
                                     onMouseLeave={(e) =>
-                                      (e.currentTarget.style.backgroundColor =
-                                        "var(--shopify-interactive)")
+                                    (e.currentTarget.style.backgroundColor =
+                                      "var(--shopify-interactive)")
                                     }
                                   >
                                     <svg
@@ -1301,12 +1296,12 @@ export default function AddProductPage() {
                               backgroundColor: "var(--shopify-action-primary)",
                             }}
                             onMouseEnter={(e) =>
-                              (e.currentTarget.style.backgroundColor =
-                                "var(--shopify-action-primary-hover)")
+                            (e.currentTarget.style.backgroundColor =
+                              "var(--shopify-action-primary-hover)")
                             }
                             onMouseLeave={(e) =>
-                              (e.currentTarget.style.backgroundColor =
-                                "var(--shopify-action-primary)")
+                            (e.currentTarget.style.backgroundColor =
+                              "var(--shopify-action-primary)")
                             }
                           >
                             <svg
@@ -1407,14 +1402,12 @@ export default function AddProductPage() {
                   placeholder="e.g., Pearl Drop Necklace"
                   value={form.name}
                   onChange={handleChange}
-                  className={`w-full px-3 py-2 rounded-lg text-sm transition-all ${
-                    errors.name ? "border-red-500" : ""
-                  }`}
+                  className={`w-full px-3 py-2 rounded-lg text-sm transition-all ${errors.name ? "border-red-500" : ""
+                    }`}
                   style={{
                     backgroundColor: "var(--shopify-surface)",
-                    border: `1.5px solid ${
-                      errors.name ? "#d72c0d" : "var(--shopify-border)"
-                    }`,
+                    border: `1.5px solid ${errors.name ? "#d72c0d" : "var(--shopify-border)"
+                      }`,
                     color: "var(--shopify-text-primary)",
                   }}
                   onFocus={(e) =>
@@ -1450,14 +1443,12 @@ export default function AddProductPage() {
 
                 {/* Description Preview or Placeholder */}
                 <div
-                  className={`w-full px-3 py-3 rounded-lg text-sm border mb-2 description-preview ${
-                    errors.description ? "border-red-500" : ""
-                  }`}
+                  className={`w-full px-3 py-3 rounded-lg text-sm border mb-2 description-preview ${errors.description ? "border-red-500" : ""
+                    }`}
                   style={{
                     backgroundColor: "var(--shopify-surface)",
-                    border: `1.5px solid ${
-                      errors.description ? "#d72c0d" : "var(--shopify-border)"
-                    }`,
+                    border: `1.5px solid ${errors.description ? "#d72c0d" : "var(--shopify-border)"
+                      }`,
                     color: "var(--shopify-text-primary)",
                     minHeight: "120px",
                     maxHeight: "200px",
@@ -1536,12 +1527,12 @@ export default function AddProductPage() {
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors"
                   style={{ backgroundColor: "var(--shopify-action-primary)" }}
                   onMouseEnter={(e) =>
-                    (e.currentTarget.style.backgroundColor =
-                      "var(--shopify-action-primary-hover)")
+                  (e.currentTarget.style.backgroundColor =
+                    "var(--shopify-action-primary-hover)")
                   }
                   onMouseLeave={(e) =>
-                    (e.currentTarget.style.backgroundColor =
-                      "var(--shopify-action-primary)")
+                  (e.currentTarget.style.backgroundColor =
+                    "var(--shopify-action-primary)")
                   }
                 >
                   <svg
@@ -1590,12 +1581,12 @@ export default function AddProductPage() {
                     color: "var(--shopify-text-primary)",
                   }}
                   onFocus={(e) =>
-                    (e.currentTarget.style.borderColor =
-                      "var(--shopify-interactive)")
+                  (e.currentTarget.style.borderColor =
+                    "var(--shopify-interactive)")
                   }
                   onBlur={(e) =>
-                    (e.currentTarget.style.borderColor =
-                      "var(--shopify-border)")
+                  (e.currentTarget.style.borderColor =
+                    "var(--shopify-border)")
                   }
                   rows={2}
                 />
@@ -1625,14 +1616,12 @@ export default function AddProductPage() {
                 accept="image/*"
                 multiple
                 onChange={handleImageChange}
-                className={`w-full px-3 py-2 rounded-lg text-sm transition-all ${
-                  errors.images ? "border-red-500" : ""
-                }`}
+                className={`w-full px-3 py-2 rounded-lg text-sm transition-all ${errors.images ? "border-red-500" : ""
+                  }`}
                 style={{
                   backgroundColor: "var(--shopify-surface)",
-                  border: `1.5px solid ${
-                    errors.images ? "#d72c0d" : "var(--shopify-border)"
-                  }`,
+                  border: `1.5px solid ${errors.images ? "#d72c0d" : "var(--shopify-border)"
+                    }`,
                   color: "var(--shopify-text-primary)",
                 }}
               />
@@ -1686,12 +1675,12 @@ export default function AddProductPage() {
                     className="w-24 h-24 border-2 border-dashed rounded-lg flex items-center justify-center cursor-pointer transition-colors"
                     style={{ borderColor: "var(--shopify-border)" }}
                     onMouseEnter={(e) =>
-                      (e.currentTarget.style.borderColor =
-                        "var(--shopify-border-hover)")
+                    (e.currentTarget.style.borderColor =
+                      "var(--shopify-border-hover)")
                     }
                     onMouseLeave={(e) =>
-                      (e.currentTarget.style.borderColor =
-                        "var(--shopify-border)")
+                    (e.currentTarget.style.borderColor =
+                      "var(--shopify-border)")
                     }
                   >
                     <svg
@@ -1723,7 +1712,7 @@ export default function AddProductPage() {
                 className="mt-3 text-xs"
                 style={{ color: "var(--shopify-text-secondary)" }}
               >
-                <p>• Upload high-quality images (JPEG, PNG, WebP)</p>
+                <p>• Upload high-quality images (JPEG, PNG, WebP, GIF)</p>
                 <p>• Maximum 4 images per product</p>
                 <p>• First image will be the primary image</p>
               </div>
@@ -1759,14 +1748,12 @@ export default function AddProductPage() {
                   name="category"
                   value={form.category}
                   onChange={handleChange}
-                  className={`w-full px-3 py-2 rounded-lg text-sm transition-all ${
-                    errors.category ? "border-red-500" : ""
-                  }`}
+                  className={`w-full px-3 py-2 rounded-lg text-sm transition-all ${errors.category ? "border-red-500" : ""
+                    }`}
                   style={{
                     backgroundColor: "var(--shopify-surface)",
-                    border: `1.5px solid ${
-                      errors.category ? "#d72c0d" : "var(--shopify-border)"
-                    }`,
+                    border: `1.5px solid ${errors.category ? "#d72c0d" : "var(--shopify-border)"
+                      }`,
                     color: "var(--shopify-text-primary)",
                   }}
                   required
@@ -1813,12 +1800,12 @@ export default function AddProductPage() {
                     color: "var(--shopify-text-primary)",
                   }}
                   onFocus={(e) =>
-                    (e.currentTarget.style.borderColor =
-                      "var(--shopify-interactive)")
+                  (e.currentTarget.style.borderColor =
+                    "var(--shopify-interactive)")
                   }
                   onBlur={(e) =>
-                    (e.currentTarget.style.borderColor =
-                      "var(--shopify-border)")
+                  (e.currentTarget.style.borderColor =
+                    "var(--shopify-border)")
                   }
                 />
               </div>
@@ -1837,14 +1824,12 @@ export default function AddProductPage() {
                   placeholder="e.g., Sabri"
                   value={form.brand}
                   onChange={handleChange}
-                  className={`w-full px-3 py-2 rounded-lg text-sm transition-all ${
-                    errors.brand ? "border-red-500" : ""
-                  }`}
+                  className={`w-full px-3 py-2 rounded-lg text-sm transition-all ${errors.brand ? "border-red-500" : ""
+                    }`}
                   style={{
                     backgroundColor: "var(--shopify-surface)",
-                    border: `1.5px solid ${
-                      errors.brand ? "#d72c0d" : "var(--shopify-border)"
-                    }`,
+                    border: `1.5px solid ${errors.brand ? "#d72c0d" : "var(--shopify-border)"
+                      }`,
                     color: "var(--shopify-text-primary)",
                   }}
                   onFocus={(e) =>
@@ -1883,14 +1868,12 @@ export default function AddProductPage() {
                   placeholder="e.g., NECK001"
                   value={form.sku}
                   onChange={handleChange}
-                  className={`w-full px-3 py-2 rounded-lg text-sm transition-all ${
-                    errors.sku ? "border-red-500" : ""
-                  }`}
+                  className={`w-full px-3 py-2 rounded-lg text-sm transition-all ${errors.sku ? "border-red-500" : ""
+                    }`}
                   style={{
                     backgroundColor: "var(--shopify-surface)",
-                    border: `1.5px solid ${
-                      errors.sku ? "#d72c0d" : "var(--shopify-border)"
-                    }`,
+                    border: `1.5px solid ${errors.sku ? "#d72c0d" : "var(--shopify-border)"
+                      }`,
                     color: "var(--shopify-text-primary)",
                   }}
                   onFocus={(e) =>
@@ -1962,12 +1945,12 @@ export default function AddProductPage() {
                       color: "var(--shopify-text-primary)",
                     }}
                     onFocus={(e) =>
-                      (e.currentTarget.style.borderColor =
-                        "var(--shopify-interactive)")
+                    (e.currentTarget.style.borderColor =
+                      "var(--shopify-interactive)")
                     }
                     onBlur={(e) =>
-                      (e.currentTarget.style.borderColor =
-                        "var(--shopify-border)")
+                    (e.currentTarget.style.borderColor =
+                      "var(--shopify-border)")
                     }
                     min="0"
                     step="0.01"
@@ -2003,12 +1986,12 @@ export default function AddProductPage() {
                       color: "var(--shopify-text-primary)",
                     }}
                     onFocus={(e) =>
-                      (e.currentTarget.style.borderColor =
-                        "var(--shopify-interactive)")
+                    (e.currentTarget.style.borderColor =
+                      "var(--shopify-interactive)")
                     }
                     onBlur={(e) =>
-                      (e.currentTarget.style.borderColor =
-                        "var(--shopify-border)")
+                    (e.currentTarget.style.borderColor =
+                      "var(--shopify-border)")
                     }
                     min="0"
                     step="0.01"
@@ -2045,12 +2028,12 @@ export default function AddProductPage() {
                       color: "var(--shopify-text-primary)",
                     }}
                     onFocus={(e) =>
-                      (e.currentTarget.style.borderColor =
-                        "var(--shopify-interactive)")
+                    (e.currentTarget.style.borderColor =
+                      "var(--shopify-interactive)")
                     }
                     onBlur={(e) =>
-                      (e.currentTarget.style.borderColor =
-                        "var(--shopify-border)")
+                    (e.currentTarget.style.borderColor =
+                      "var(--shopify-border)")
                     }
                     min="0"
                     step="0.01"
@@ -2116,14 +2099,12 @@ export default function AddProductPage() {
                 placeholder="0"
                 value={form.stock}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 rounded-lg text-sm transition-all ${
-                  errors.stock ? "border-red-500" : ""
-                }`}
+                className={`w-full px-3 py-2 rounded-lg text-sm transition-all ${errors.stock ? "border-red-500" : ""
+                  }`}
                 style={{
                   backgroundColor: "var(--shopify-surface)",
-                  border: `1.5px solid ${
-                    errors.stock ? "#d72c0d" : "var(--shopify-border)"
-                  }`,
+                  border: `1.5px solid ${errors.stock ? "#d72c0d" : "var(--shopify-border)"
+                    }`,
                   color: "var(--shopify-text-primary)",
                 }}
                 onFocus={(e) =>
@@ -2180,14 +2161,12 @@ export default function AddProductPage() {
                   placeholder="e.g., Pearl, Diamond"
                   value={form.material}
                   onChange={handleChange}
-                  className={`w-full px-3 py-2 rounded-lg text-sm transition-all ${
-                    errors.material ? "border-red-500" : ""
-                  }`}
+                  className={`w-full px-3 py-2 rounded-lg text-sm transition-all ${errors.material ? "border-red-500" : ""
+                    }`}
                   style={{
                     backgroundColor: "var(--shopify-surface)",
-                    border: `1.5px solid ${
-                      errors.material ? "#d72c0d" : "var(--shopify-border)"
-                    }`,
+                    border: `1.5px solid ${errors.material ? "#d72c0d" : "var(--shopify-border)"
+                      }`,
                     color: "var(--shopify-text-primary)",
                   }}
                   onFocus={(e) =>
@@ -2224,14 +2203,12 @@ export default function AddProductPage() {
                   name="metalType"
                   value={form.metalType}
                   onChange={handleChange}
-                  className={`w-full px-3 py-2 rounded-lg text-sm transition-all ${
-                    errors.metalType ? "border-red-500" : ""
-                  }`}
+                  className={`w-full px-3 py-2 rounded-lg text-sm transition-all ${errors.metalType ? "border-red-500" : ""
+                    }`}
                   style={{
                     backgroundColor: "var(--shopify-surface)",
-                    border: `1.5px solid ${
-                      errors.metalType ? "#d72c0d" : "var(--shopify-border)"
-                    }`,
+                    border: `1.5px solid ${errors.metalType ? "#d72c0d" : "var(--shopify-border)"
+                      }`,
                     color: "var(--shopify-text-primary)",
                   }}
                   required
@@ -2274,12 +2251,12 @@ export default function AddProductPage() {
                     color: "var(--shopify-text-primary)",
                   }}
                   onFocus={(e) =>
-                    (e.currentTarget.style.borderColor =
-                      "var(--shopify-interactive)")
+                  (e.currentTarget.style.borderColor =
+                    "var(--shopify-interactive)")
                   }
                   onBlur={(e) =>
-                    (e.currentTarget.style.borderColor =
-                      "var(--shopify-border)")
+                  (e.currentTarget.style.borderColor =
+                    "var(--shopify-border)")
                   }
                 />
               </div>
@@ -2305,12 +2282,12 @@ export default function AddProductPage() {
                     color: "var(--shopify-text-primary)",
                   }}
                   onFocus={(e) =>
-                    (e.currentTarget.style.borderColor =
-                      "var(--shopify-interactive)")
+                  (e.currentTarget.style.borderColor =
+                    "var(--shopify-interactive)")
                   }
                   onBlur={(e) =>
-                    (e.currentTarget.style.borderColor =
-                      "var(--shopify-border)")
+                  (e.currentTarget.style.borderColor =
+                    "var(--shopify-border)")
                   }
                 />
               </div>
@@ -2336,12 +2313,12 @@ export default function AddProductPage() {
                     color: "var(--shopify-text-primary)",
                   }}
                   onFocus={(e) =>
-                    (e.currentTarget.style.borderColor =
-                      "var(--shopify-interactive)")
+                  (e.currentTarget.style.borderColor =
+                    "var(--shopify-interactive)")
                   }
                   onBlur={(e) =>
-                    (e.currentTarget.style.borderColor =
-                      "var(--shopify-border)")
+                  (e.currentTarget.style.borderColor =
+                    "var(--shopify-border)")
                   }
                 />
               </div>
@@ -2367,12 +2344,12 @@ export default function AddProductPage() {
                     color: "var(--shopify-text-primary)",
                   }}
                   onFocus={(e) =>
-                    (e.currentTarget.style.borderColor =
-                      "var(--shopify-interactive)")
+                  (e.currentTarget.style.borderColor =
+                    "var(--shopify-interactive)")
                   }
                   onBlur={(e) =>
-                    (e.currentTarget.style.borderColor =
-                      "var(--shopify-border)")
+                  (e.currentTarget.style.borderColor =
+                    "var(--shopify-border)")
                   }
                 />
               </div>
@@ -2400,8 +2377,8 @@ export default function AddProductPage() {
                 className="flex items-center gap-2 p-2 border rounded-lg cursor-pointer transition-colors"
                 style={{ borderColor: "var(--shopify-border)" }}
                 onMouseEnter={(e) =>
-                  (e.currentTarget.style.backgroundColor =
-                    "var(--shopify-surface-hover)")
+                (e.currentTarget.style.backgroundColor =
+                  "var(--shopify-surface-hover)")
                 }
                 onMouseLeave={(e) =>
                   (e.currentTarget.style.backgroundColor = "transparent")
@@ -2426,8 +2403,8 @@ export default function AddProductPage() {
                 className="flex items-center gap-2 p-2 border rounded-lg cursor-pointer transition-colors"
                 style={{ borderColor: "var(--shopify-border)" }}
                 onMouseEnter={(e) =>
-                  (e.currentTarget.style.backgroundColor =
-                    "var(--shopify-surface-hover)")
+                (e.currentTarget.style.backgroundColor =
+                  "var(--shopify-surface-hover)")
                 }
                 onMouseLeave={(e) =>
                   (e.currentTarget.style.backgroundColor = "transparent")
@@ -2452,8 +2429,8 @@ export default function AddProductPage() {
                 className="flex items-center gap-2 p-2 border rounded-lg cursor-pointer transition-colors"
                 style={{ borderColor: "var(--shopify-border)" }}
                 onMouseEnter={(e) =>
-                  (e.currentTarget.style.backgroundColor =
-                    "var(--shopify-surface-hover)")
+                (e.currentTarget.style.backgroundColor =
+                  "var(--shopify-surface-hover)")
                 }
                 onMouseLeave={(e) =>
                   (e.currentTarget.style.backgroundColor = "transparent")
@@ -2478,8 +2455,8 @@ export default function AddProductPage() {
                 className="flex items-center gap-2 p-2 border rounded-lg cursor-pointer transition-colors"
                 style={{ borderColor: "var(--shopify-border)" }}
                 onMouseEnter={(e) =>
-                  (e.currentTarget.style.backgroundColor =
-                    "var(--shopify-surface-hover)")
+                (e.currentTarget.style.backgroundColor =
+                  "var(--shopify-surface-hover)")
                 }
                 onMouseLeave={(e) =>
                   (e.currentTarget.style.backgroundColor = "transparent")
@@ -2504,8 +2481,8 @@ export default function AddProductPage() {
                 className="flex items-center gap-2 p-2 border rounded-lg cursor-pointer transition-colors"
                 style={{ borderColor: "var(--shopify-border)" }}
                 onMouseEnter={(e) =>
-                  (e.currentTarget.style.backgroundColor =
-                    "var(--shopify-surface-hover)")
+                (e.currentTarget.style.backgroundColor =
+                  "var(--shopify-surface-hover)")
                 }
                 onMouseLeave={(e) =>
                   (e.currentTarget.style.backgroundColor = "transparent")
@@ -2530,8 +2507,8 @@ export default function AddProductPage() {
                 className="flex items-center gap-2 p-2 border rounded-lg cursor-pointer transition-colors"
                 style={{ borderColor: "var(--shopify-border)" }}
                 onMouseEnter={(e) =>
-                  (e.currentTarget.style.backgroundColor =
-                    "var(--shopify-surface-hover)")
+                (e.currentTarget.style.backgroundColor =
+                  "var(--shopify-surface-hover)")
                 }
                 onMouseLeave={(e) =>
                   (e.currentTarget.style.backgroundColor = "transparent")
@@ -2556,8 +2533,8 @@ export default function AddProductPage() {
                 className="flex items-center gap-2 p-2 border rounded-lg cursor-pointer transition-colors"
                 style={{ borderColor: "var(--shopify-border)" }}
                 onMouseEnter={(e) =>
-                  (e.currentTarget.style.backgroundColor =
-                    "var(--shopify-surface-hover)")
+                (e.currentTarget.style.backgroundColor =
+                  "var(--shopify-surface-hover)")
                 }
                 onMouseLeave={(e) =>
                   (e.currentTarget.style.backgroundColor = "transparent")
@@ -2582,8 +2559,8 @@ export default function AddProductPage() {
                 className="flex items-center gap-2 p-2 border rounded-lg cursor-pointer transition-colors"
                 style={{ borderColor: "var(--shopify-border)" }}
                 onMouseEnter={(e) =>
-                  (e.currentTarget.style.backgroundColor =
-                    "var(--shopify-surface-hover)")
+                (e.currentTarget.style.backgroundColor =
+                  "var(--shopify-surface-hover)")
                 }
                 onMouseLeave={(e) =>
                   (e.currentTarget.style.backgroundColor = "transparent")
@@ -2608,8 +2585,8 @@ export default function AddProductPage() {
                 className="flex items-center gap-2 p-2 border rounded-lg cursor-pointer transition-colors"
                 style={{ borderColor: "var(--shopify-border)" }}
                 onMouseEnter={(e) =>
-                  (e.currentTarget.style.backgroundColor =
-                    "var(--shopify-surface-hover)")
+                (e.currentTarget.style.backgroundColor =
+                  "var(--shopify-surface-hover)")
                 }
                 onMouseLeave={(e) =>
                   (e.currentTarget.style.backgroundColor = "transparent")
@@ -2639,12 +2616,12 @@ export default function AddProductPage() {
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm text-white transition-colors"
               style={{ backgroundColor: "var(--shopify-action-primary)" }}
               onMouseEnter={(e) =>
-                (e.currentTarget.style.backgroundColor =
-                  "var(--shopify-action-primary-hover)")
+              (e.currentTarget.style.backgroundColor =
+                "var(--shopify-action-primary-hover)")
               }
               onMouseLeave={(e) =>
-                (e.currentTarget.style.backgroundColor =
-                  "var(--shopify-action-primary)")
+              (e.currentTarget.style.backgroundColor =
+                "var(--shopify-action-primary)")
               }
             >
               <span>Save product</span>

@@ -20,8 +20,8 @@ export async function POST(request) {
       );
     }
 
-    // Validate file types
-    const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+    // Validate file types (including GIF for animated images)
+    const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"];
     const invalidFiles = files.filter(
       (file) => !validTypes.includes(file.type)
     );
@@ -30,7 +30,7 @@ export async function POST(request) {
       return NextResponse.json(
         {
           success: false,
-          message: `Invalid file types detected. Please upload only JPEG, PNG, or WebP images.`,
+          message: `Invalid file types detected. Please upload only JPEG, PNG, WebP, or GIF images.`,
         },
         { status: 400 }
       );

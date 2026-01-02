@@ -67,9 +67,10 @@ ADMIN_PASSWORD=admin123
    - CSV-ready URLs
 
 4. **Image Management**
-   - Automatic resizing to 800x800px max
+   - Automatic resizing to 800x800px max (static images only)
    - Quality optimization
    - Format conversion (JPEG/PNG/WebP)
+   - GIF support with animation preservation
    - Secure HTTPS delivery
 
 ## 🎯 Jewelry-Specific Features
@@ -84,7 +85,8 @@ ADMIN_PASSWORD=admin123
 - **Max Dimensions**: 800x800px (maintains aspect ratio)
 - **Quality**: Auto-optimized for web
 - **Format**: Auto-converts to WebP when beneficial
-- **File Types**: JPEG, PNG, WebP supported
+- **File Types**: JPEG, PNG, WebP, GIF supported
+- **GIF Handling**: Uploaded without resizing to preserve animation frames
 
 ### **Admin Interface:**
 
@@ -96,7 +98,7 @@ ADMIN_PASSWORD=admin123
 
 ## 🔐 Security Features
 
-- File type validation (JPEG, PNG, WebP only)
+- File type validation (JPEG, PNG, WebP, GIF)
 - File size limits (10MB per image)
 - Secure API endpoints
 - Admin authentication required
@@ -131,7 +133,7 @@ ADMIN_PASSWORD=admin123
 1. **"No images provided"**
 
    - Ensure files are selected before upload
-   - Check file types (JPEG, PNG, WebP only)
+   - Check file types (JPEG, PNG, WebP, GIF)
 
 2. **"Files too large"**
 
@@ -156,7 +158,7 @@ echo $CLOUDINARY_API_KEY     # Should output: 653169211298715
 ### **Recommended Settings:**
 
 - **Resolution**: 800x800px or higher
-- **Format**: JPEG for photos, PNG for transparent backgrounds
+- **Format**: JPEG for photos, PNG for transparent backgrounds, GIF for animated images
 - **File Size**: Under 2MB for optimal performance
 - **Aspect Ratio**: Square (1:1) works best for jewelry
 
