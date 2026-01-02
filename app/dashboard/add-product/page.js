@@ -1732,7 +1732,7 @@ export default function AddProductPage() {
               className="text-base font-semibold mb-4"
               style={{ color: "var(--shopify-text-primary)" }}
             >
-              Organization
+              Categorization
             </h2>
 
             <div className="space-y-4">
